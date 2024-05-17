@@ -11,6 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>ReprojectSurvey</Name>
     <RootNamespace>ReprojectSurvey</RootNamespace>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,11 +22,27 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="arcpy.py" />
+    <Compile Include="support\config.py" />
     <Compile Include="ReprojectSurvey.py" />
+    <Compile Include="support\reprojection.py" />
+    <Compile Include="support\parameters.py" />
+    <Compile Include="tests\conftest.py" />
+    <Compile Include="tests\test_config.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="testConfg.ini" />
+    <Content Include="arcpy.py" />
+    <Content Include="pyproject.toml" />
+    <Content Include="tests\test_data\minimalValidConfig.ini" />
+    <Content Include="tests\test_data\missingParamConfig.ini" />
+    <Content Include="tests\test_data\fullValidConfig.ini" />
+    <Content Include="PythonSettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="tests\" />
+    <Folder Include="support\" />
+    <Folder Include="tests\test_data\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
