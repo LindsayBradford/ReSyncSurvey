@@ -1,9 +1,14 @@
-from dataclasses import MISSING
-from optparse import Option
+# -*- coding: utf-8 -*-
+# ---------------------------------------------------------------------------
+# support/config.py
+# Author: Lindsay Bradford, Truii.com, 2024.
+# Release History:
+# ---------------------------------------------------------------------------
+# V1: Initial release
+
 from support.parameters import *
 
 import configparser
-import os
 
 import arcpy
 
@@ -11,39 +16,59 @@ DEFAULT_SECTION = 'DEFAULT'
 CONFIG = 'CONFIG'
 
 class Config:
+
     def __init__(self):
         self.configMap = {}
         if arcpy.GetParameterAsText(0) == CONFIG:
-            filepath = arcpy.GetParameterAsText(1)
-            section = arcpy.GetParameterAsText(2)
-
-            self.deriveParametersFromConfigFile(filepath, section)
+            self.deriveParametersFromConfigFile()
         else:
             self.deriveParametersFromCommandLine()
 
 
-    def deriveParametersFromConfigFile(self, filepath, section):
+    def deriveParametersFromConfigFile(self):
+        self.filepath = arcpy.GetParameterAsText(1)
+        self.section = arcpy.GetParameterAsText(2)
+        
+        self.parseConfig()
+
+
+    def parseConfig(self):
+        parser = self.buildParser()
+     
+        self.parseMandatoryParameters(parser)
+        self.parseOptionalParameters(parser)
+
+
+    def buildParser(self):
         parser = configparser.ConfigParser(default_section=DEFAULT_SECTION)
 
-        if not os.access(filepath, os.R_OK):
-            raise SystemExit(f"Invalid config file [{filepath}] passed as config parser parameter")
-        
-        parser.read(filepath)
+        filesParsed = parser.read(self.filepath)
+        if self.filepath not in filesParsed:
+            raise SystemExit(f"Invalid config file [{self.filepath}] passed as config parser parameter")
 
+        if self.section not in parser.sections():
+            raise SystemExit(f"Invalid section [{self.section}] for config file [{self.filepath}] passed as config parser parameter")
+        
+        return parser
+        
+
+    def parseMandatoryParameters(self, parser):
         misingParameters = []
         for option in MANDATORY_PARAMETERS:            
-            if option not in parser[section]:
+            if option not in parser[self.section]:
                 misingParameters.append(option)
             else:
-                self.configMap[option] = parser.get(section, option)
+                self.configMap[option] = parser.get(self.section, option)
 
         if len(misingParameters) > 0:
-            raise SystemExit(f"Expected parameter(s) {misingParameters} missing from config file [{filepath}]")
-                
-        for option in OPTIONAL_PARAMETERS:            
-            if option in parser[section]:
-                self.configMap[option] = parser.get(section, option)
+            raise SystemExit(f"Expected parameter(s) {misingParameters} missing from config file [{self.filepath}]")
 
+        
+    def parseOptionalParameters(self, parser):
+        for option in OPTIONAL_PARAMETERS:
+            if option in parser[self.section]:
+                self.configMap[option] = parser.get(self.section, option)
+        
 
     def deriveParametersFromCommandLine(self):
         self.configMap[SDE_CONNECTION] = arcpy.GetParameterAsText(0)
@@ -53,7 +78,7 @@ class Config:
         self.configMap[PORTAL] = arcpy.GetParameterAsText(4)
         self.configMap[USER_NAME] = arcpy.GetParameterAsText(5)
         self.configMap[PASSWORD] = arcpy.GetParameterAsText(6)
-        self.configMap[REPROJECT_CODE] = arcpy.GetParameterAsText(7)
+        self.configMap[REPROJECT_CODE] = arcpy.GetParameterAsText(7)  # TODO: check syncsurvey, maybe this should go before credentials?
         
         
     def map(self):

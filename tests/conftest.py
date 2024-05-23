@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+# ---------------------------------------------------------------------------
+# tests/conftest.py
+# Author: Lindsay Bradford, Truii.com, 2024.
+# Release History:
+# ---------------------------------------------------------------------------
+# V1: Initial release
+
 import pytest
 import os
 from pathlib import Path

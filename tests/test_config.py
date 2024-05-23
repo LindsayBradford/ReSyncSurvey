@@ -1,9 +1,17 @@
-from xml.dom import UserDataHandler
+# -*- coding: utf-8 -*-
+# ---------------------------------------------------------------------------
+# test/test_config.py
+# Author: Lindsay Bradford, Truii.com, 2024.
+# Release History:
+# ---------------------------------------------------------------------------
+# V1: Initial release
+
 import arcpy
 import sys
 
 from support.parameters import *
 from support.config import *
+
 import pytest
 
 @pytest.mark.usefixtures("useTestDataDirectory")    
@@ -18,7 +26,7 @@ class TestConfig:
 
         #when/then
 
-        with pytest.raises(SystemExit, match=r'configNotPresent\.ini') as info:
+        with pytest.raises(SystemExit, match=r'Invalid config file \[configNotPresent\.ini\]') as info:
             configUnderTest = Config()
         
         print(f'Exception message = [{info.value}]')
@@ -37,6 +45,21 @@ class TestConfig:
             configUnderTest = Config()
         
         print(f'Exception message = [{info.value}]')
+
+
+    def test_Init_CONFIG_MissingSection(self):
+            # given
+
+            arcpy.SetParameterAsText(0,"CONFIG")
+            arcpy.SetParameterAsText(1,"fullValidConfig.ini")
+            arcpy.SetParameterAsText(2,"NotValidSection")
+
+            #when/then
+
+            with pytest.raises(SystemExit, match=r'Invalid section \[NotValidSection\]') as info:
+                configUnderTest = Config()
+        
+            print(f'Exception message = [{info.value}]')
 
 
     def test_Init_CONFIG_MimimalIsValid(self):

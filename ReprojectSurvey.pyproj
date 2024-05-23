@@ -24,6 +24,7 @@
   <ItemGroup>
     <Compile Include="support\config.py" />
     <Compile Include="ReprojectSurvey.py" />
+    <Compile Include="support\time.py" />
     <Compile Include="support\reprojection.py" />
     <Compile Include="support\parameters.py" />
     <Compile Include="tests\conftest.py" />
@@ -38,6 +39,7 @@
     <Content Include="tests\test_data\missingParamConfig.ini" />
     <Content Include="tests\test_data\fullValidConfig.ini" />
     <Content Include="PythonSettings.json" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="tests\" />
