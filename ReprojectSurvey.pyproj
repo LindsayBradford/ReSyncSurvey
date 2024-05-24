@@ -11,7 +11,10 @@
     <OutputPath>.</OutputPath>
     <Name>ReprojectSurvey</Name>
     <RootNamespace>ReprojectSurvey</RootNamespace>
-    <TestFramework>Pytest</TestFramework>
+    <TestFramework>pytest</TestFramework>
+    <InterpreterId>Global|VisualStudio|v3-9-11-SeqwaterArcgisPro</InterpreterId>
+    <UnitTestPattern>test*.py</UnitTestPattern>
+    <UnitTestRootDirectory>.</UnitTestRootDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,6 +48,9 @@
     <Folder Include="tests\" />
     <Folder Include="support\" />
     <Folder Include="tests\test_data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|VisualStudio|v3-9-11-SeqwaterArcgisPro" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

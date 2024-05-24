@@ -5,7 +5,7 @@ description = "Reproject Survey Utility Script"
 authors = ["Lindsay Bradford <lindsay.bradford@truii.com>"]
 
 [project.dependencies]
-pytest = "7.4.3"
+pytest = "8.2.1"
 
 [tool.pytest.ini_options]
 pythonpath = "."
