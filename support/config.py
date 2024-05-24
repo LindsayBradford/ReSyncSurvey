@@ -17,8 +17,9 @@ CONFIG = 'CONFIG'
 
 class Config:
 
-    def __init__(self):
+    def __init__(self) :
         self.configMap = {}
+            
         if arcpy.GetParameterAsText(0) == CONFIG:
             self.deriveParametersFromConfigFile()
         else:
@@ -33,41 +34,39 @@ class Config:
 
 
     def parseConfig(self):
-        parser = self.buildParser()
+        self.parseConfigFile()
      
-        self.parseMandatoryParameters(parser)
-        self.parseOptionalParameters(parser)
+        self.parseMandatoryParameters()
+        self.parseOptionalParameters()
 
 
-    def buildParser(self):
-        parser = configparser.ConfigParser(default_section=DEFAULT_SECTION)
+    def parseConfigFile(self):
+        self.parser = configparser.ConfigParser(default_section = DEFAULT_SECTION)
+        filesParsed = self.parser.read(self.filepath)
 
-        filesParsed = parser.read(self.filepath)
         if self.filepath not in filesParsed:
             raise SystemExit(f"Invalid config file [{self.filepath}] passed as config parser parameter")
 
-        if self.section not in parser.sections():
+        if self.section not in self.parser.sections():
             raise SystemExit(f"Invalid section [{self.section}] for config file [{self.filepath}] passed as config parser parameter")
         
-        return parser
-        
 
-    def parseMandatoryParameters(self, parser):
+    def parseMandatoryParameters(self):
         misingParameters = []
         for option in MANDATORY_PARAMETERS:            
-            if option not in parser[self.section]:
+            if option not in self.parser[self.section]:
                 misingParameters.append(option)
             else:
-                self.configMap[option] = parser.get(self.section, option)
+                self.configMap[option] = self.parser.get(self.section, option)
 
         if len(misingParameters) > 0:
             raise SystemExit(f"Expected parameter(s) {misingParameters} missing from config file [{self.filepath}]")
 
         
-    def parseOptionalParameters(self, parser):
+    def parseOptionalParameters(self):
         for option in OPTIONAL_PARAMETERS:
-            if option in parser[self.section]:
-                self.configMap[option] = parser.get(self.section, option)
+            if option in self.parser[self.section]:
+                self.configMap[option] = self.parser.get(self.section, option)
         
 
     def deriveParametersFromCommandLine(self):
