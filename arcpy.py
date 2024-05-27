@@ -10,12 +10,26 @@
 
 import sys
 
+def GetSigninToken():
+    tokenPkg = {
+        'token': 'randomTokenString',
+        'referer': '127.0.0.1',
+        'expires': '60',
+        'messages': 'here is a token message'
+    }
+    return tokenPkg
+
 def AddMessage(message):
     print(message)
 
 
 def GetParameterCount():
-    return len(sys.argv)
+    argCount = 0
+    while(sys.argv[argCount] != ''):
+        argCount = argCount + 1
+#    print(sys.argv[:argCount])
+    return argCount - 1
+
 
 
 def GetParameterAsText(parmeterIndex):

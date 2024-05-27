@@ -6,6 +6,12 @@
 # ---------------------------------------------------------------------------
 # V1: Initial release
 
+import arcpy
+
+MAP_CONTENT = 'CONFIG'
+CONFIG_FILE_PATH = 'filepath'
+CONFIG_FILE_SECTION = 'section'
+
 SDE_CONNECTION = 'sde_conn'
 PREFIX = 'prefix'
 TIMEZONE = 'timezone'
@@ -28,3 +34,29 @@ OPTIONAL_PARAMETERS = [
     USER_NAME,
     PASSWORD
 ]
+
+def produceParameters():
+    rawParams = []
+
+    for index in range(arcpy.GetParameterCount()):
+        rawParams.append(arcpy.GetParameterAsText(index))
+        
+    params = {}
+    if arcpy.GetParameterCount() >= 3 and arcpy.GetParameterAsText(0) == MAP_CONTENT:
+        params[CONFIG_FILE_PATH] = arcpy.GetParameterAsText(1)
+        params[CONFIG_FILE_SECTION] = arcpy.GetParameterAsText(2)
+    elif arcpy.GetParameterCount() >= 6:
+        params[SDE_CONNECTION] = arcpy.GetParameterAsText(0)
+        params[PREFIX] = arcpy.GetParameterAsText(1)
+        params[SERVICE_URL] = arcpy.GetParameterAsText(2)
+        params[TIMEZONE] = arcpy.GetParameterAsText(3)
+        params[PORTAL] = arcpy.GetParameterAsText(4)
+        params[REPROJECT_CODE] = arcpy.GetParameterAsText(5)  # TODO: check syncsurvey, maybe this should go before credentials?
+        params[USER_NAME] = arcpy.GetParameterAsText(6)
+        params[PASSWORD] = arcpy.GetParameterAsText(7)
+    else:
+        raise SystemExit(f"Expected parameter(s) [{arcpy.GetParameterCount()}] were not supplied")
+
+    return params
+        
+        

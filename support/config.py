@@ -10,76 +10,78 @@ from support.parameters import *
 
 import configparser
 
-import arcpy
-
 DEFAULT_SECTION = 'DEFAULT'
 CONFIG = 'CONFIG'
 
 class Config:
 
-    def __init__(self) :
-        self.configMap = {}
+    def __init__(self):
+        self.withConfigMap(None)
+        self.withParser(None)
+
             
-        if arcpy.GetParameterAsText(0) == CONFIG:
-            self.deriveParametersFromConfigFile()
+    def withConfigMap(self, configMap):
+        self.configMap = configMap
+        return self
+
+    
+    def withParser(self,parser):
+        if parser == None:
+            self.parser = configparser.ConfigParser(default_section = DEFAULT_SECTION)
         else:
-            self.deriveParametersFromCommandLine()
+            self.parser = parser
+        return self
 
 
-    def deriveParametersFromConfigFile(self):
-        self.filepath = arcpy.GetParameterAsText(1)
-        self.section = arcpy.GetParameterAsText(2)
-        
-        self.parseConfig()
+    def map(self):
+        if self.configMap == None:
+            self.configMap = produceParameters()
+
+        if CONFIG_FILE_PATH in self.configMap.keys():
+            self.deriveMapFromConfigFile()
+            
+        return self.configMap
 
 
-    def parseConfig(self):
+    def deriveMapFromConfigFile(self):
         self.parseConfigFile()
      
         self.parseMandatoryParameters()
         self.parseOptionalParameters()
 
+        del self.configMap[CONFIG_FILE_PATH]
+        del self.configMap[CONFIG_FILE_SECTION]
+
 
     def parseConfigFile(self):
-        self.parser = configparser.ConfigParser(default_section = DEFAULT_SECTION)
-        filesParsed = self.parser.read(self.filepath)
+        if self.configMap == {}:
+            raise SystemExit(f"No configuration supplied before attempting to specify a parser.")
 
-        if self.filepath not in filesParsed:
-            raise SystemExit(f"Invalid config file [{self.filepath}] passed as config parser parameter")
+        if CONFIG_FILE_PATH not in self.configMap.keys():
+            raise SystemExit(f"Configuration supplied doesn't need a parser.")
 
-        if self.section not in self.parser.sections():
-            raise SystemExit(f"Invalid section [{self.section}] for config file [{self.filepath}] passed as config parser parameter")
-        
+        filesParsed = self.parser.read(self.configMap[CONFIG_FILE_PATH])
+
+        if self.configMap[CONFIG_FILE_PATH] not in filesParsed:
+            raise SystemExit(f"Invalid config file [{self.configMap[CONFIG_FILE_PATH]}] passed as config parser parameter")
+
+        if self.configMap[CONFIG_FILE_SECTION] not in self.parser.sections():
+            raise SystemExit(f"Invalid section [{self.configMap[CONFIG_FILE_SECTION]}] for config file [{self.configMap[CONFIG_FILE_PATH]}] passed as config parser parameter")
+
 
     def parseMandatoryParameters(self):
         misingParameters = []
         for option in MANDATORY_PARAMETERS:            
-            if option not in self.parser[self.section]:
+            if option not in self.parser[self.configMap[CONFIG_FILE_SECTION]]:
                 misingParameters.append(option)
             else:
-                self.configMap[option] = self.parser.get(self.section, option)
+                self.configMap[option] = self.parser.get(self.configMap[CONFIG_FILE_SECTION], option)
 
         if len(misingParameters) > 0:
-            raise SystemExit(f"Expected parameter(s) {misingParameters} missing from config file [{self.filepath}]")
+            raise SystemExit(f"Expected parameter(s) {misingParameters} missing from config file [{self.configMap[CONFIG_FILE_PATH]}]")
 
         
     def parseOptionalParameters(self):
         for option in OPTIONAL_PARAMETERS:
-            if option in self.parser[self.section]:
-                self.configMap[option] = self.parser.get(self.section, option)
-        
-
-    def deriveParametersFromCommandLine(self):
-        self.configMap[SDE_CONNECTION] = arcpy.GetParameterAsText(0)
-        self.configMap[PREFIX] = arcpy.GetParameterAsText(1)
-        self.configMap[SERVICE_URL] = arcpy.GetParameterAsText(2)
-        self.configMap[TIMEZONE] = arcpy.GetParameterAsText(3)
-        self.configMap[PORTAL] = arcpy.GetParameterAsText(4)
-        self.configMap[USER_NAME] = arcpy.GetParameterAsText(5)
-        self.configMap[PASSWORD] = arcpy.GetParameterAsText(6)
-        self.configMap[REPROJECT_CODE] = arcpy.GetParameterAsText(7)  # TODO: check syncsurvey, maybe this should go before credentials?
-        
-        
-    def map(self):
-        return self.configMap
-
+            if option in self.parser[self.configMap[CONFIG_FILE_SECTION]]:
+                self.configMap[option] = self.parser.get(self.configMap[CONFIG_FILE_SECTION], option)
