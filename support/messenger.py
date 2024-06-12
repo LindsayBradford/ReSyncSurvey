@@ -42,6 +42,10 @@ class Messenger(object):
         self.msg(msgText, ' INFO')
 
 
+    def warn(self,msgText):
+        self.msg(msgText, ' WARN')
+
+
     def error(self,msgText):
         self.msg(msgText, 'ERROR')
 

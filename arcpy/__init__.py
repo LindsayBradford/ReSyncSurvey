@@ -11,6 +11,7 @@
 import sys
 from . import env
 from . import da
+from . import management
 
 messages = []
 
@@ -154,11 +155,7 @@ def ListFields(table):
 def CreateFileGDB_management(pathOnly, dbName):
     pass
 
-def GetCount_management(*tableNames):
-    counts = []
-    for tableName in tableNames:
-        counts.append(0)
-    return counts
+
 
 
 def SpatialReference(CRS):

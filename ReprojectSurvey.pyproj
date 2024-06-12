@@ -27,6 +27,7 @@
   <ItemGroup>
     <Compile Include="arcpy\da\__init__.py" />
     <Compile Include="arcpy\env\__init__.py" />
+    <Compile Include="arcpy\management\__init__.py" />
     <Compile Include="support\config.py" />
     <Compile Include="ReprojectSurvey.py" />
     <Compile Include="support\appender.py" />
@@ -61,6 +62,7 @@
     <Folder Include="arcpy\" />
     <Folder Include="arcpy\env\" />
     <Folder Include="arcpy\da\" />
+    <Folder Include="arcpy\management\" />
     <Folder Include="tests\" />
     <Folder Include="support\" />
     <Folder Include="tests\support\" />

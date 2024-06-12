@@ -10,10 +10,13 @@
 from support.parameters import *
 from support.messenger import Messenger
 
+
+
 from abc import ABC, abstractmethod
 import support.time as time
 import os
 import uuid
+import arcpy.management
 
 # Context keys
 
@@ -68,7 +71,10 @@ class FGDBReprojectionTransformer(Transformer):
         existingTables = self.getSurveyTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
         if len(existingTables) > 0:
             self.getLastSynchronizationTime(existingTables)
-            self.messenger.info(f'Last synchronisaation time established [{time.createTimestampText(self.context[LAST_SYNC_TIME])}]')
+            if self.context[LAST_SYNC_TIME] != None:
+                self.messenger.info(f'Last synchronisation time established [{time.createTimestampText(self.context[LAST_SYNC_TIME])}]')
+            else:
+                self.messenger.warn(f'No last synchronisation time establised, despite [{len(existingTables)}] tables found.')
         else:
             self.messenger.info(f'No existing tables with prefix [{self.parameters[PREFIX]}] found in [{self.parameters[SDE_CONNECTION]}]')
             
@@ -144,8 +150,8 @@ class FGDBReprojectionTransformer(Transformer):
             self.messenger.debug(f'Checking sync on table [{table}]')
             #Just use the last part of the table name
             tableName = FGDBReprojectionTransformer.lastPartOfTableName(table)
-            rowCheck = arcpy.GetCount_management(tableName)
-            rowCount = rowCheck[0]
+            rowCheck = arcpy.management.GetCount(tableName)
+            rowCount = int(rowCheck[0])
             if rowCount > 0:
                 statTable = arcpy.Statistics_analysis(tableName, r'in_memory\stat_{0}'.format(tableName), "SYS_TRANSFER_DATE MAX")
                 statTables.append(statTable)
@@ -161,7 +167,7 @@ class FGDBReprojectionTransformer(Transformer):
             arcpy.Delete_management(s)
 
         if lastSync == time.dummyTimestamp():
-            self.context[LAST_SYNC_TIME] =  time.getUTCTimestamp(self.parameters[TIMEZONE])
+            self.context[LAST_SYNC_TIME] =  None
         else:
             self.context[LAST_SYNC_TIME] = lastSync
             

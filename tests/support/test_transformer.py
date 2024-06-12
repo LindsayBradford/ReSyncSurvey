@@ -56,7 +56,7 @@ class TestFGDReprojectionTransformer:
         }
         
         context = {
-            PROCESS_TIME: time.getUTCTimestamp(parameters[TIMEZONE])    
+            PROCESS_TIME: time.getUTCTimestamp(parameters[TIMEZONE]),
         }
         
         fakeReplicatedGeodatabase = 'fakeReplicant.gdb'
