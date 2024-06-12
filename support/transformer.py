@@ -32,7 +32,6 @@ class Transformer(ABC):
         return None
 
 
-
 class NullTransformer(Transformer):
     def __init__(self, parametersSupplied):
         self.context = {}
@@ -190,7 +189,7 @@ class FGDBReprojectionTransformer(Transformer):
         tableList = self.getSurveyTables(surveyGDB)
         dateField = arcpy.AddFieldDelimiters(surveyGDB, "CreationDate")
         excludeStatement = "CreationDate > date '{1}'".format(dateField, nowText)
-        if self.context[LAST_SYNC_TIME] != None:
+        if LAST_SYNC_TIME in self.context.keys() and self.context[LAST_SYNC_TIME] != None:
             lastSyncText = time.createTimestampText(self.context[LAST_SYNC_TIME])
             excludeStatement = f"{excludeStatement} OR CreationDate <= date '{lastSyncText}'"
 
