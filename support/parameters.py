@@ -7,6 +7,19 @@
 # V1: Initial release
 
 import arcpy
+from support.messenger import Messenger
+
+# Context keys
+
+TOKEN = 'Token'
+SERVICE_INFO = 'ServiceInfo'
+LAST_SYNC_TIME = 'LastSynchronisationTime'
+PROCESS_TIME = 'ProcessTime'
+SECTION = 'ProcessSection'
+CLEANUP_OPERATIONS = 'CleanupOperations'
+EXISTING_TABLES = 'ExistingTables'
+
+# parameter keys
 
 MAP_CONTENT = 'CONFIG'
 CONFIG_FILE_PATH = 'filepath'
@@ -38,14 +51,14 @@ OPTIONAL_PARAMETERS = [
 def produceParameters():
     rawParams = []
 
-    for index in range(arcpy.GetParameterCount()):
+    for index in range(arcpy.GetArgumentCount()):
         rawParams.append(arcpy.GetParameterAsText(index))
         
     params = {}
-    if arcpy.GetParameterCount() >= 3 and arcpy.GetParameterAsText(0) == MAP_CONTENT:
+    if arcpy.GetArgumentCount() >= 3 and arcpy.GetParameterAsText(0) == MAP_CONTENT:
         params[CONFIG_FILE_PATH] = arcpy.GetParameterAsText(1)
         params[CONFIG_FILE_SECTION] = arcpy.GetParameterAsText(2)
-    elif arcpy.GetParameterCount() >= 6:
+    elif arcpy.GetArgumentCount() >= 6:
         params[SDE_CONNECTION] = arcpy.GetParameterAsText(0)
         params[PREFIX] = arcpy.GetParameterAsText(1)
         params[SERVICE_URL] = arcpy.GetParameterAsText(2)
@@ -55,7 +68,9 @@ def produceParameters():
         params[USER_NAME] = arcpy.GetParameterAsText(6)
         params[PASSWORD] = arcpy.GetParameterAsText(7)
     else:
-        raise SystemExit(f"Expected parameter(s) [{arcpy.GetParameterCount()}] were not supplied")
+        raise SystemExit(f"Expected parameter(s) [{arcpy.GetArgumentCount()}] were not supplied")
+    
+    Messenger().info(f'Parameters supplied: [{params}]')
 
     return params
         

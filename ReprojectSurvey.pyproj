@@ -25,19 +25,32 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="arcpy\da\__init__.py" />
+    <Compile Include="arcpy\env\__init__.py" />
     <Compile Include="support\config.py" />
     <Compile Include="ReprojectSurvey.py" />
+    <Compile Include="support\appender.py" />
+    <Compile Include="support\messenger.py" />
+    <Compile Include="support\transformer.py" />
+    <Compile Include="support\survey_replicator.py" />
     <Compile Include="support\time.py" />
-    <Compile Include="support\reprojection.py" />
+    <Compile Include="support\survey_reprojector.py" />
     <Compile Include="support\parameters.py" />
+    <Compile Include="tests\support\test_survey_reprojector.py" />
     <Compile Include="tests\conftest.py" />
-    <Compile Include="tests\test_config.py">
+    <Compile Include="tests\test_data\syncEnabledFeatureServiceInfo.json" />
+    <Compile Include="tests\support\test_appender.py" />
+    <Compile Include="tests\support\test_transformer.py" />
+    <Compile Include="tests\support\test_survey_replcator.py" />
+    <Compile Include="tests\support\test_messenger.py" />
+    <Compile Include="tests\support\test_config.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="arcpy.py" />
+    <Content Include="arcpy\__init__.py" />
     <Content Include="pyproject.toml" />
+    <Content Include="tests\test_data\fakeFileGeodatabase.zip" />
     <Content Include="tests\test_data\minimalValidConfig.ini" />
     <Content Include="tests\test_data\missingParamConfig.ini" />
     <Content Include="tests\test_data\fullValidConfig.ini" />
@@ -45,8 +58,12 @@
     <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="arcpy\" />
+    <Folder Include="arcpy\env\" />
+    <Folder Include="arcpy\da\" />
     <Folder Include="tests\" />
     <Folder Include="support\" />
+    <Folder Include="tests\support\" />
     <Folder Include="tests\test_data\" />
   </ItemGroup>
   <ItemGroup>

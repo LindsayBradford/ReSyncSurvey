@@ -7,17 +7,43 @@
 # V1: Initial release
 # ---------------------------------------------------------------------------
 
+from importlib import reload
 
-from support.config import Config
-from support.reprojection import Reprojection
+import support.config as config
+import support.survey_reprojector as reprojector
+import support.survey_replicator as replicator
+import support.transformer as transformer
+import support.appender as appender
+import support.messenger as messenger
+
+NAME='ReprojectSurvey'
+VERSION = '1.0'
+
+def buildReprojector(configSupplied):
+    return reprojector.SurveyReprojector(configSupplied).\
+                usingSurveyReplicator(replicator.AGOLSurveyReplicator(configSupplied)).\
+                usingReprojector(transformer.FGDBReprojectionTransformer(configSupplied)).\
+                usingAppender(appender.SDEAppender(configSupplied))
 
 
 def main():
-    configSupplied = Config().map()
+    messenger.Messenger().info(f'{NAME} version {VERSION}')
 
-    reprojection = Reprojection(configSupplied)
-    reprojection.reproject()
+    configSupplied = config.Config().map()
+    reprojector = buildReprojector(configSupplied)
+    reprojector.reproject()
+
+
+def reloadModulesForArcGISPro():
+    # https://gis.stackexchange.com/questions/91112/refreshing-imported-modules-in-arcgis-python-toolbox
+    reload(messenger)
+    reload(config)
+    reload(reprojector)
+    reload(replicator)
+    reload(transformer)
+    reload(appender)
 
 
 if __name__ == '__main__':
+    reloadModulesForArcGISPro()       
     main()

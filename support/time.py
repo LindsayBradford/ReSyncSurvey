@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------
 # V1: Initial release
 
-import datetime, pytz
+import datetime, pytz, time
 
 TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -23,5 +23,10 @@ def getUTCTimestamp(inputTimezone):
 
     return utcNow
 
+
 def dummyTimestamp():
     return datetime.datetime.fromtimestamp(0)
+
+
+def sleep(seconds):
+    time.sleep(seconds)

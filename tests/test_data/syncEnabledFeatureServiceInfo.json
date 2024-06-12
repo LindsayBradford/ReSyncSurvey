@@ -1,0 +1,25 @@
+{
+  "capabilities": [
+    "Sync"
+  ],
+  "syncCapabilities": {
+    "supportsAttachmentsSyncDirection": true,
+    "attachmentsSyncDirection": "bidirectional"
+  },
+  "layers": [
+    {
+      "id": "layer1"
+    },
+    {
+      "id": "layer2"
+    }
+  ],
+  "tables": [
+    {
+      "id": "table1"
+    },
+    {
+      "id": "table2"
+    }
+  ]
+}
