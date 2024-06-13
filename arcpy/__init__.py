@@ -152,11 +152,8 @@ def ListFields(table):
     # https://pro.arcgis.com/en/pro-app/latest/arcpy/functions/listfields.htm
     return [Field('oid')]
 
-def CreateFileGDB_management(pathOnly, dbName):
-    pass
-
-
-
+def Statistics_analysis(tableName, workspace, analysisType):
+    return None
 
 def SpatialReference(CRS):
     pass

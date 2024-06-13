@@ -103,7 +103,7 @@ class FGDBReprojectionTransformer(Transformer):
         #List the Feature Classes & Tables
         #Tables also returns Attachment tables
         
-        self.messenger.info(f'Applying pattern match ["{wildcard}"] for table search at [{self.parameters[SDE_CONNECTION]}]')
+        self.messenger.info(f'Applying pattern match ["{wildcard}"] for table search at [{arcpy.env.workspace}]')
 
         featureClasses = arcpy.ListFeatureClasses(wildcard)
         tables = arcpy.ListTables(wildcard)
@@ -136,8 +136,8 @@ class FGDBReprojectionTransformer(Transformer):
 
     def getLastSynchronizationTime(self, tableList):
         # Looks at the existing records in the SDE and returns the latest synchronization time
-        workspace = self.parameters[SDE_CONNECTION]
-        arcpy.env.workspace = workspace
+        originalWorkspace = arcpy.env.workspace
+        arcpy.env.workspace = self.parameters[SDE_CONNECTION]
 
         statTables = []
         #Dummy value to compare time
@@ -153,7 +153,7 @@ class FGDBReprojectionTransformer(Transformer):
             rowCheck = arcpy.management.GetCount(tableName)
             rowCount = int(rowCheck[0])
             if rowCount > 0:
-                statTable = arcpy.Statistics_analysis(tableName, r'in_memory\stat_{0}'.format(tableName), "SYS_TRANSFER_DATE MAX")
+                statTable = arcpy.Statistics_analysis(tableName, f'in_memory\stat_{tableName}', "SYS_TRANSFER_DATE MAX")
                 statTables.append(statTable)
 
         for s in statTables:
@@ -170,7 +170,8 @@ class FGDBReprojectionTransformer(Transformer):
             self.context[LAST_SYNC_TIME] =  None
         else:
             self.context[LAST_SYNC_TIME] = lastSync
-            
+
+        arcpy.env.workspace = originalWorkspace
         self.messenger.outdent()
 
 
@@ -255,10 +256,11 @@ class FGDBReprojectionTransformer(Transformer):
 
 
     def setTimestampOnTables(self, surveyGDB, tableList):
-        self.messenger.info(f'Setting timestamps on tables...')
+        timestamp = self.context[PROCESS_TIME]
+
+        self.messenger.info(f'Setting timestamp [{time.createTimestampText(timestamp)}] on tables...')
         self.messenger.indent()
 
-        timestamp = self.context[PROCESS_TIME]
 
         with arcpy.da.Editor(surveyGDB) as edit:
             for table in tableList:

@@ -40,3 +40,6 @@ class Cursor():
 
 def UpdateCursor(FQtable, where_clause):
     return Cursor()
+
+def SearchCursor(table, columnList):
+    return Cursor()

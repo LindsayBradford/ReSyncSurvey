@@ -88,7 +88,7 @@ class SDEAppender(Appender):
 
             dbName = split[1]
 
-            arcpy.CreateFileGDB_management(pathOnly, dbName)
+            arcpy.management.CreateFileGDB(pathOnly, dbName)
             self.messenger.info(f'Destinaion file geodatabase [{destinationDB}] created')
 
 

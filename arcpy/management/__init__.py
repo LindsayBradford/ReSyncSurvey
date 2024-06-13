@@ -1,3 +1,6 @@
+def CreateFileGDB(pathOnly, dbName):
+    pass
+
 
 def GetCount(*tableNames):
     counts = []
