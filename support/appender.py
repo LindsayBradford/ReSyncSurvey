@@ -111,6 +111,8 @@ class SDEAppender(Appender):
 
         surveyGDBdesc = arcpy.Describe(arcpy.env.workspace)
         
+
+
         self.migrateDomainsToDestination(surveyGDB, surveyGDBdesc)
         self.createDestinationFeatureClassesAndTables(surveyGDB, surveyGDBdesc)
         self.createDestinationRelationships(surveyGDBdesc)
@@ -146,6 +148,19 @@ class SDEAppender(Appender):
 
         destWorkspace = self.parameters[SDE_CONNECTION]  
         prefix = self.parameters[PREFIX]
+        
+        # TODO: Does this force the CRS transformation? James Tedrick (syncSurvey author, ESRI employee, email 27/03/24, says yes)
+        # https://pro.arcgis.com/en/pro-app/latest/tool-reference/environment-settings/geographic-transformations.htm
+        # arcpy.env.outputCoordinateSystem = arcpy.SpatialReference("WGS 1984 UTM Zone 18N")
+        # arcpy.env.geographicTransformations = "Arc_1950_To_WGS_1984_5; PSAD_1956_To_WGS_1984_6"
+        # https://epsg.io/7856s
+
+        self.messenger.info(f'Applying CRS [{self.parameters[REPROJECT_CODE]}] as output coordinate system')
+        arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(self.parameters[REPROJECT_CODE])
+
+        geographicTransform = "WGS_1984_To_GDA2020_3"
+        self.messenger.info(f'Applying geographic transformation [{geographicTransform}] as output coordinate transformation')
+        arcpy.env.geographicTransformations = geographicTransform
 
         allTables = self.getSurveyTables(surveyGDB)
         for table in allTables:
@@ -233,7 +248,7 @@ class SDEAppender(Appender):
 
                 #Regular Relation
 
-                self.messenger.info(f"Enabling relationship [{newRC}] of type [{relationshipType}] between [{newOriginTable}] and [{newDestTable}]...")
+                self.messenger.info(f"Enabling [{relationshipType}] relationship between [{newOriginTable}] and [{newDestTable}]...")
                 arcpy.CreateRelationshipClass_management(newOriginPath, newDestPath, newRC, relationshipType, fwd_label, bck_label, msg_dir, cardinality, attributed, originPrimaryKey, originForiegnKey)
 
             self.messenger.outdent()
@@ -299,13 +314,6 @@ class SDEAppender(Appender):
         self.messenger.indent()
 
         arcpy.env.workspace = surveyGDB
-        # TODO: Does this force the CRS transformation? James Tedrick (syncSurvey author, ESRI employee, email 27/03/24, says yes)
-        # https://pro.arcgis.com/en/pro-app/latest/tool-reference/environment-settings/geographic-transformations.htm
-        # arcpy.env.outputCoordinateSystem = arcpy.SpatialReference("WGS 1984 UTM Zone 18N")
-        # arcpy.env.geographicTransformations = "Arc_1950_To_WGS_1984_5; PSAD_1956_To_WGS_1984_6"
-        # https://epsg.io/7856s
-
-        arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(self.parameters[REPROJECT_CODE])
         
         tableList = self.getSurveyTables(surveyGDB)
         attachmentList = self.getTablesWithAttachments(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
@@ -323,13 +331,11 @@ class SDEAppender(Appender):
 
             self.messenger.debug(f'Processing replica [{table}] -> SDE [{destinationName}]...')
 
-            #First, append the table
-            #Match up the fields
             originFieldNames = [f.name for f in arcpy.ListFields(table)]
             destFieldNames = [f.name for f in arcpy.ListFields(destinationFC)]
             fieldMap = self.createFieldMap(table, originFieldNames, destFieldNames)
 
-            arcpy.Append_management(table, destinationFC, 'NO_TEST', fieldMap)
+            arcpy.management.Append(table, destinationFC, 'NO_TEST', fieldMap)
 
             if destinationName in attachmentList:
                 self.appendAttachments(table, destinationFC)
@@ -421,7 +427,7 @@ class SDEAppender(Appender):
         tempTableName = r'in_memory\AttachTemp'
         
         self.messenger.debug(f'Copying attachment table [{inAttachTable}] rows to [{tempTableName}]...')
-        tempTable = arcpy.CopyRows_management(inAttachTable, tempTableName)
+        tempTable = arcpy.management.CopyRows(inAttachTable, tempTableName)
 
         # 3) update the attachment table with new GlobalIDs
         self.messenger.debug(f'Updating table [{tempTableName}] with new GlobalIDs...')
@@ -433,7 +439,7 @@ class SDEAppender(Appender):
         # 4) Append to destination attachment table
         self.messenger.debug(f'Appending table [{tempTableName}] to [{outAttachTable}]...')
         
-        arcpy.Append_management(tempTable, outAttachTable, 'NO_TEST')
+        arcpy.management.Append(tempTable, outAttachTable, 'NO_TEST')
 
         self.messenger.debug(f'Deleting table [{tempTableName}]...')
         arcpy.Delete_management(tempTable)

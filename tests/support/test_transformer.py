@@ -106,7 +106,7 @@ class FakeArcpyBridge():
         return None
 
 
-@pytest.mark.usefixtures("useTestDataDirectory", "resetArcpy", "resetMessengerSingleton")    
+@pytest.mark.usefixtures("useTestDataDirectory", "resetArcpy", "resetMessengerSingleton") 
 class TestFGDReprojectionTransformer:
     
     def test_FGDBReprojectionTransformer_transform_no_existing_data(self):
@@ -121,7 +121,7 @@ class TestFGDReprojectionTransformer:
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'some_destination.gdb',
-            REPROJECT_CODE: 'WSG84-to-GDA2020-standin',
+            REPROJECT_CODE: 'GDA2020 MGA Zone 56',
         }
         
         context = {
@@ -156,7 +156,7 @@ class TestFGDReprojectionTransformer:
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'some_destination.gdb',
-            REPROJECT_CODE: 'WSG84-to-GDA2020-standin',
+            REPROJECT_CODE: 'GDA2020 MGA Zone 56',
         }
         
         context = {
@@ -193,7 +193,7 @@ class TestFGDReprojectionTransformer:
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'some_destination.gdb',
-            REPROJECT_CODE: 'WSG84-to-GDA2020-standin',
+            REPROJECT_CODE: 'GDA2020 MGA Zone 56',
             'destinationTimestamp': time.dummyTimestamp()
         }
         

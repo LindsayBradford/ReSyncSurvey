@@ -23,8 +23,6 @@ from urllib.parse import unquote
 from pathlib import Path
 from support.survey_replicator import AGOLSurveyReplicator
 
-# https://developers.arcgis.com/rest/services-reference/enterprise/feature-service/
-
 class FakeZipFile():
     def __init__(self):
         self.extracted = 0
@@ -40,6 +38,7 @@ class FakeZipFile():
         pass
 
 
+# See: https://developers.arcgis.com/rest/services-reference/enterprise/feature-service/
 class FakeGoodCredentialsHttpsHandler(HTTPSHandler):
 
     def __init__(self):

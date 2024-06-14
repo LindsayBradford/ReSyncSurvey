@@ -281,6 +281,9 @@ class AGOLSurveyReplicator(SurveyReplicator):
         unzippedSurveyGDBpath = os.path.join(outDir, surveyGDB)   
         self.messenger.info(f'Survey geodatabase unzipped to [{unzippedSurveyGDBpath}]')
 
+        os.remove(outFile) 
+        self.messenger.info(f'Removed zipped replica file [{outFile}]')
+
         self.messenger.outdent()
         return unzippedSurveyGDBpath
         

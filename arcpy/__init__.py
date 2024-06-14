@@ -118,9 +118,6 @@ def CreateTable_management(outWorkspace, newTableName, template=None):
 def AssignDomainToField_management(tableName, fieldName, domainName):
     pass
 
-def Append_management(table, destination, schemaType, field_mapping):
-    # https://pro.arcgis.com/en/pro-app/latest/tool-reference/data-management/append.htm
-    pass
 
 class FieldMappings():
     # https://pro.arcgis.com/en/pro-app/latest/arcpy/classes/fieldmappings.htm

@@ -30,7 +30,7 @@ class TestSDEAppender:
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'c:/tmp/some_destination.gdb',
-            REPROJECT_CODE: 'WSG84-to-GDA2020-standin',
+            REPROJECT_CODE: 'GDA2020 MGA Zone 56',
         }
         
         context = {
