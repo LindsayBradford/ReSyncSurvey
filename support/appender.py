@@ -62,6 +62,14 @@ class SDEAppender(Appender):
     def appendFrom(self, surveyGDB):
         self.context[CLEANUP_OPERATIONS] = {}
 
+        self.messenger.info(f'Applying CRS [{self.parameters[REPROJECT_CODE]}] as output coordinate system')
+        arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(self.parameters[REPROJECT_CODE])
+
+        geographicTransform = "WGS_1984_2_To_GDA2020"
+        self.messenger.info(f'Applying geographic transformation [{geographicTransform}] as output coordinate transformation')
+        arcpy.env.geographicTransformations = geographicTransform
+
+
         self.messenger.info(f'Appending data from [{surveyGDB}] to [{self.parameters[SDE_CONNECTION]}]...')
         self.messenger.indent()
 
@@ -106,12 +114,12 @@ class SDEAppender(Appender):
 
     def createTablesAtDestination(self, surveyGDB):
         arcpy.env.workspace = surveyGDB
+        
+        workspace = surveyGDB
 
         self.messenger.info('Creating needed tables in destination workspace...')
 
         surveyGDBdesc = arcpy.Describe(arcpy.env.workspace)
-        
-
 
         self.migrateDomainsToDestination(surveyGDB, surveyGDBdesc)
         self.createDestinationFeatureClassesAndTables(surveyGDB, surveyGDBdesc)
@@ -146,21 +154,10 @@ class SDEAppender(Appender):
 
         self.messenger.indent()
 
-        destWorkspace = self.parameters[SDE_CONNECTION]  
+        destWorkspace = self.parameters[SDE_CONNECTION]
+
+        destSpatialReference = arcpy.SpatialReference(self.parameters[REPROJECT_CODE])
         prefix = self.parameters[PREFIX]
-        
-        # TODO: Does this force the CRS transformation? James Tedrick (syncSurvey author, ESRI employee, email 27/03/24, says yes)
-        # https://pro.arcgis.com/en/pro-app/latest/tool-reference/environment-settings/geographic-transformations.htm
-        # arcpy.env.outputCoordinateSystem = arcpy.SpatialReference("WGS 1984 UTM Zone 18N")
-        # arcpy.env.geographicTransformations = "Arc_1950_To_WGS_1984_5; PSAD_1956_To_WGS_1984_6"
-        # https://epsg.io/7856s
-
-        self.messenger.info(f'Applying CRS [{self.parameters[REPROJECT_CODE]}] as output coordinate system')
-        arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(self.parameters[REPROJECT_CODE])
-
-        geographicTransform = "WGS_1984_To_GDA2020_3"
-        self.messenger.info(f'Applying geographic transformation [{geographicTransform}] as output coordinate transformation')
-        arcpy.env.geographicTransformations = geographicTransform
 
         allTables = self.getSurveyTables(surveyGDB)
         for table in allTables:
@@ -170,7 +167,7 @@ class SDEAppender(Appender):
 
             if dsc.datatype == u'FeatureClass':
                 self.messenger.debug(f"Creating Feature Classes [{newTableName}]...")
-                newTable = arcpy.CreateFeatureclass_management(destWorkspace, newTableName, "POINT", template=templateTable, spatial_reference=dsc.spatialReference)
+                newTable = arcpy.CreateFeatureclass_management(destWorkspace, newTableName, "POINT", template=templateTable, spatial_reference=destSpatialReference )
             else:
                 self.messenger.debug(f"Creating Table [{newTableName}]...")
                 newTable = arcpy.CreateTable_management(destWorkspace, newTableName, template=templateTable)
