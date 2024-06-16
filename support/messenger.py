@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+# ---------------------------------------------------------------------------
+# support/messemger.py  - Singleton messenger, wrapping arcpy messaging
+# Author: Lindsay Bradford, Truii.com, 2024.
+# Release History:
+# ---------------------------------------------------------------------------
+# V1: Initial release
+
 from datetime import datetime
 import arcpy
 

@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+# ---------------------------------------------------------------------------
+# Name: tests/support/test_transformer.py
+# Purpose: Testing harness for support/transformer.py
+# Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
+# Release History:
+# ---------------------------------------------------------------------------
+# V1: Initial release
+
 from support.parameters import *
 import support.time as time
 

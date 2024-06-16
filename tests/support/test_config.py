@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# test/test_config.py
-# Author: Lindsay Bradford, Truii.com, 2024.
+# Name: tests/support/test_config.py
+# Purpose: Testing harness for support/config.py
+# Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
 # Release History:
 # ---------------------------------------------------------------------------
 # V1: Initial release

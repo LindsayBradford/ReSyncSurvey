@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# arcpy  -- Test stub stamding in for ESRI arcpy module.
+# arcpy.da  -- Test stub stamding in for ESRI arcpy sub-module.
 # Author: Lindsay Bradford, Truii.com, 2024.
 # Release History:
 # ---------------------------------------------------------------------------

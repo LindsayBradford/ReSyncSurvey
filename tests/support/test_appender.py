@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Name: support/survey_replicator.py
-# Purpose: To replicate a survey out of AGOL into a temporary file geodatabase
+# Name: tests/support/test_appender.py
+# Purpose: Testing harness for support/appender.py
 # Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
 # Release History:
 # ---------------------------------------------------------------------------
