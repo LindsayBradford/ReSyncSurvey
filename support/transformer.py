@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 import support.time as time
 import os
 import uuid
-import arcpy.management
+import arcpy
 
 # Context keys
 
@@ -164,7 +164,7 @@ class FGDBReprojectionTransformer(Transformer):
                         lastSync = thisDate
 
         for s in statTables:
-            arcpy.Delete_management(s)
+            arcpy.management.Delete(s)
 
         if lastSync == time.dummyTimestamp():
             self.context[LAST_SYNC_TIME] =  None
@@ -208,12 +208,12 @@ class FGDBReprojectionTransformer(Transformer):
             thisName = f'filterView{str(i)}'
             dsc = arcpy.Describe(table)
             if dsc.datatype == u'FeatureClass' or dsc.datatype == u'FeatureLayer':
-                arcpy.MakeFeatureLayer_management(table, thisName, excludeStatement)
-                arcpy.DeleteFeatures_management(thisName)
+                arcpy.management.MakeFeatureLayer(table, thisName, excludeStatement)
+                arcpy.management.DeleteFeatures(thisName)
             else:
-                arcpy.MakeTableView_management(table, thisName, excludeStatement)
-                arcpy.DeleteRows_management(thisName)
-            arcpy.Delete_management(thisName)
+                arcpy.management.MakeTableView(table, thisName, excludeStatement)
+                arcpy.management.DeleteRows(thisName)
+            arcpy.management.Delete(thisName)
         
         self.messenger.outdent()
         self.messenger.info(f'Done filtering records to new set since last synchronised...')
@@ -246,10 +246,10 @@ class FGDBReprojectionTransformer(Transformer):
             #Disable Editor Tracking
             
             self.messenger.debug(f'Disabling Editor Tracking on table [{table}]')
-            arcpy.DisableEditorTracking_management(FQtable)
+            arcpy.management.DisableEditorTracking(FQtable)
             #Add a synchronization field
 
-            arcpy.AddField_management(FQtable, 'SYS_TRANSFER_DATE', 'DATE')
+            arcpy.management.AddField(FQtable, 'SYS_TRANSFER_DATE', 'DATE')
 
         self.messenger.outdent()
         self.messenger.info(f'Done disabling editor tracking on tables')
@@ -260,7 +260,6 @@ class FGDBReprojectionTransformer(Transformer):
 
         self.messenger.info(f'Setting timestamp [{time.createTimestampText(timestamp)}] on tables...')
         self.messenger.indent()
-
 
         with arcpy.da.Editor(surveyGDB) as edit:
             for table in tableList:
@@ -287,7 +286,7 @@ class FGDBReprojectionTransformer(Transformer):
                 originTable = dscRC.originClassNames[0]
                 originFieldNames = [f.name for f in arcpy.ListFields(originTable)]
                 if 'rowid' not in originFieldNames:
-                    arcpy.AddField_management(originTable, 'rowid', 'GUID')
+                    arcpy.management.AddField(originTable, 'rowid', 'GUID')
                     with arcpy.da.Editor(workspace) as edit:
                         with arcpy.da.UpdateCursor(originTable, ['rowid']) as urows:
                             for urow in urows:

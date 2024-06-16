@@ -141,7 +141,7 @@ class SDEAppender(Appender):
                 tempTable = f'in_memory\{domainName}'
                 arcpy.DomainToTable_management(surveyGDB, domainName, tempTable,'CODE', 'DESC')
                 arcpy.TableToDomain_management(tempTable, 'CODE', 'DESC', destWorkspace, domainName, update_option='REPLACE')
-                arcpy.Delete_management(tempTable)
+                arcpy.management.Delete(tempTable)
         self.messenger.outdent()
 
         self.messenger.info('Done migrating domains')
@@ -170,7 +170,7 @@ class SDEAppender(Appender):
                 newTable = arcpy.CreateFeatureclass_management(destWorkspace, newTableName, "POINT", template=templateTable, spatial_reference=destSpatialReference )
             else:
                 self.messenger.debug(f"Creating Table [{newTableName}]...")
-                newTable = arcpy.CreateTable_management(destWorkspace, newTableName, template=templateTable)
+                newTable = arcpy.management.CreateTable(destWorkspace, newTableName, template=templateTable)
             
             self.messenger.indent()
 
@@ -182,7 +182,7 @@ class SDEAppender(Appender):
             for field in tableFields:
                 if field.domain != '':
                     self.messenger.debug(f"Field [{newTableName}.{field.name}] being assigned domain [{field.domain}]")
-                    arcpy.AssignDomainToField_management(newTable, field.name, field.domain)
+                    arcpy.management.AssignDomainToField(newTable, field.name, field.domain)
             self.messenger.outdent()
 
             if surveyGDBdesc.workspaceType == "RemoteDatabase":
@@ -439,7 +439,7 @@ class SDEAppender(Appender):
         arcpy.management.Append(tempTable, outAttachTable, 'NO_TEST')
 
         self.messenger.debug(f'Deleting table [{tempTableName}]...')
-        arcpy.Delete_management(tempTable)
+        arcpy.management.Delete(tempTable)
 
         self.messenger.debug(f'Done appending attachments for [{outFC}]...')
         self.messenger.outdent()

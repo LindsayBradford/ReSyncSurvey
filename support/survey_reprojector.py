@@ -112,16 +112,15 @@ class SurveyReprojector:
             dsc = arcpy.Describe(table)
             if dsc.datatype == u'FeatureClass':
                 arcpy.MakeFeatureLayer_management(table, thisName, whereStatment)
-                arcpy.DeleteFeatures_management(thisName)
+                arcpy.management.DeleteFeatures(thisName)
             else:
                 arcpy.MakeTableView_management(table, thisName, whereStatment)
                 arcpy.DeleteRows_management(thisName)
-            # arcpy.Delete_management(view) -- What was this meant to do in syncSurvey originally?
 
 
     def cleanupCreatedTables(self):
         for table in self.getSurveyTables():
-            arcpy.Delete_management(table)
+            arcpy.management.Delete(table)
 
 
     def getSurveyTables(self):

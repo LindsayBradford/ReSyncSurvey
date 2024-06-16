@@ -1,4 +1,12 @@
-
+# -*- coding: utf-8 -*-
+# ---------------------------------------------------------------------------
+# arcpy.da -- Test stub stamding in for ESRI arcpy sub-module
+# Author: Lindsay Bradford, Truii.com, 2024.
+# Release History:
+# ---------------------------------------------------------------------------
+# V1: Initial release
+# ---------------------------------------------------------------------------
+#
 
 class Editor():
     # https://pro.arcgis.com/en/pro-app/latest/arcpy/data-access/editor.htm
