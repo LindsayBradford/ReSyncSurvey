@@ -104,7 +104,7 @@ class TestConfig:
         assert len(actualConfigMap) == 8
 
         assert actualConfigMap[PREFIX] == 'myprefix'
-        assert actualConfigMap[USER_NAME] == 'TheUser'
-        assert actualConfigMap[PASSWORD] == 'NopeNopeNopeNope'
+        assert actualConfigMap[PORTAL_USER_NAME] == 'TheUser'
+        assert actualConfigMap[PORTAL_PASSWORD] == 'NopeNopeNopeNope'
         assert actualConfigMap[SERVICE_URL] == 'https://yaddayaddayadda.com/rest-of-url'
 

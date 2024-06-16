@@ -121,14 +121,14 @@ class TestAGOLSurveyReplicator:
            
         parameters = {
             PORTAL: 'https://www.not.really.arcgis.com',
-            USER_NAME: 'TheUser',
-            PASSWORD: 'NopeNopeNopeNope',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
             SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
 
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'blob.gdb',
-            REPROJECT_CODE: 'WSG84-to-GDA2020-standin',
+            DESTINATION_CRS: 'WSG84-to-GDA2020-standin',
         }
 
         
@@ -165,14 +165,14 @@ class TestAGOLSurveyReplicator:
            
         parameters = {
             PORTAL: 'https://www.not.really.arcgis.com',
-            USER_NAME: 'BadUser',
-            PASSWORD: 'BadPassword',
+            PORTAL_USER_NAME: 'BadUser',
+            PORTAL_PASSWORD: 'BadPassword',
             SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
 
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'blob.gdb',
-            REPROJECT_CODE: 'WSG84-to-GDA2020-standin',
+            DESTINATION_CRS: 'WSG84-to-GDA2020-standin',
         }
 
         validServiceInfo = Path('syncEnabledFeatureServiceInfo.json').read_text()

@@ -29,9 +29,10 @@ SDE_CONNECTION = 'sde_conn'
 PREFIX = 'prefix'
 TIMEZONE = 'timezone'
 PORTAL = 'portal'
-USER_NAME = 'username'
-PASSWORD = 'password'
-REPROJECT_CODE = 'reprojection'
+PORTAL_USER_NAME = 'username'
+PORTAL_PASSWORD = 'password'
+DESTINATION_CRS = 'destination_crs'
+DESTINATION_GEOGRAPHIC_TRANSFORMATIONS = 'destination_geo_transforms'
 SERVICE_URL = 'service_url'
 
 MANDATORY_PARAMETERS = [
@@ -39,13 +40,13 @@ MANDATORY_PARAMETERS = [
     PREFIX,
     TIMEZONE,
     PORTAL,
-    REPROJECT_CODE,
+    DESTINATION_CRS,
     SERVICE_URL
 ]
 
 OPTIONAL_PARAMETERS = [
-    USER_NAME,
-    PASSWORD
+    PORTAL_USER_NAME,
+    PORTAL_PASSWORD
 ]
 
 def produceParameters():
@@ -64,9 +65,10 @@ def produceParameters():
         params[SERVICE_URL] = arcpy.GetParameterAsText(2)
         params[TIMEZONE] = arcpy.GetParameterAsText(3)
         params[PORTAL] = arcpy.GetParameterAsText(4)
-        params[REPROJECT_CODE] = arcpy.GetParameterAsText(5)  # TODO: check syncsurvey, maybe this should go before credentials?
-        params[USER_NAME] = arcpy.GetParameterAsText(6)
-        params[PASSWORD] = arcpy.GetParameterAsText(7)
+        params[DESTINATION_CRS] = arcpy.GetParameterAsText(5) 
+        params[DESTINATION_GEOGRAPHIC_TRANSFORMATIONS] = arcpy.GetParameterAsText(5)  
+        params[PORTAL_USER_NAME] = arcpy.GetParameterAsText(7)
+        params[PORTAL_PASSWORD] = arcpy.GetParameterAsText(8)
     else:
         raise SystemExit(f"Expected parameter(s) [{arcpy.GetArgumentCount()}] were not supplied")
     

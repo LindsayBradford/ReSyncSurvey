@@ -150,14 +150,14 @@ class AGOLSurveyReplicator(SurveyReplicator):
     def generateTokenRequestParams(self):
         params = self.parameters
 
-        if params[PASSWORD] == None:
-            params[PASSWORD]= getpass.getpass()
+        if params[PORTAL_PASSWORD] == None:
+            params[PORTAL_PASSWORD]= getpass.getpass()
 
         parameters = urllib.parse.urlencode({
-            'username': params[USER_NAME],
-            'password': params[PASSWORD],
+            'username': params[PORTAL_USER_NAME],
+            'password': params[PORTAL_PASSWORD],
             'client': 'referer',
-            'referer': params[USER_NAME],
+            'referer': params[PORTAL_USER_NAME],
             'expiration': TOKEN_EXPIRY_MINUTES,
             'f': 'json'
         }).encode('utf-8')

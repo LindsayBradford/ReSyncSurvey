@@ -32,14 +32,15 @@ class TestSDEAppender:
            
         parameters = {
             PORTAL: 'https://www.not.really.arcgis.com',
-            USER_NAME: 'TheUser',
-            PASSWORD: 'NopeNopeNopeNope',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
             SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
 
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'c:/tmp/some_destination.gdb',
-            REPROJECT_CODE: 'GDA2020 MGA Zone 56',
+            DESTINATION_CRS: 'GDA2020_MGA_Zone_56',
+            DESTINATION_GEOGRAPHIC_TRANSFORMATIONS: "WGS_1984_2_To_GDA2020"
         }
         
         context = {
@@ -56,5 +57,7 @@ class TestSDEAppender:
             transformerUnderTest.appendFrom(fakeReplicatedGeodatabase)
 
         assert len(fakeArcpy.spatialReferenceInputs) == 2
-        assert fakeArcpy.spatialReferenceInputs[0] == parameters[REPROJECT_CODE] # General env projection/transformation
-        assert fakeArcpy.spatialReferenceInputs[1] == parameters[REPROJECT_CODE] # Explicit feature class creation
+        assert fakeArcpy.spatialReferenceInputs[0] == parameters[DESTINATION_CRS] # General env projection/transformation
+        assert fakeArcpy.spatialReferenceInputs[1] == parameters[DESTINATION_CRS] # Explicit feature class creation
+        
+        assert arcpy.env.geographicTransformations == parameters[DESTINATION_GEOGRAPHIC_TRANSFORMATIONS] # General env projection/transformation

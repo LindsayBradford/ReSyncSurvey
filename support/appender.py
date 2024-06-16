@@ -62,10 +62,10 @@ class SDEAppender(Appender):
     def appendFrom(self, surveyGDB):
         self.context[CLEANUP_OPERATIONS] = {}
 
-        self.messenger.info(f'Applying CRS [{self.parameters[REPROJECT_CODE]}] as output coordinate system')
-        arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(self.parameters[REPROJECT_CODE])
+        self.messenger.info(f'Applying CRS [{self.parameters[DESTINATION_CRS]}] as output coordinate system')
+        arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(self.parameters[DESTINATION_CRS])
 
-        geographicTransform = "WGS_1984_2_To_GDA2020"
+        geographicTransform = self.parameters[DESTINATION_GEOGRAPHIC_TRANSFORMATIONS]
         self.messenger.info(f'Applying geographic transformation [{geographicTransform}] as output coordinate transformation')
         arcpy.env.geographicTransformations = geographicTransform
 
@@ -156,7 +156,7 @@ class SDEAppender(Appender):
 
         destWorkspace = self.parameters[SDE_CONNECTION]
 
-        destSpatialReference = arcpy.SpatialReference(self.parameters[REPROJECT_CODE])
+        destSpatialReference = arcpy.SpatialReference(self.parameters[DESTINATION_CRS])
         prefix = self.parameters[PREFIX]
 
         allTables = self.getSurveyTables(surveyGDB)

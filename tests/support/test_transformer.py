@@ -123,14 +123,14 @@ class TestFGDReprojectionTransformer:
            
         parameters = {
             PORTAL: 'https://www.not.really.arcgis.com',
-            USER_NAME: 'TheUser',
-            PASSWORD: 'NopeNopeNopeNope',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
             SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
 
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'some_destination.gdb',
-            REPROJECT_CODE: 'GDA2020 MGA Zone 56',
+            DESTINATION_CRS: 'GDA2020 MGA Zone 56',
         }
         
         context = {
@@ -158,14 +158,14 @@ class TestFGDReprojectionTransformer:
            
         parameters = {
             PORTAL: 'https://www.not.really.arcgis.com',
-            USER_NAME: 'TheUser',
-            PASSWORD: 'NopeNopeNopeNope',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
             SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
 
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'some_destination.gdb',
-            REPROJECT_CODE: 'GDA2020 MGA Zone 56',
+            DESTINATION_CRS: 'GDA2020 MGA Zone 56',
         }
         
         context = {
@@ -195,14 +195,14 @@ class TestFGDReprojectionTransformer:
            
         parameters = {
             PORTAL: 'https://www.not.really.arcgis.com',
-            USER_NAME: 'TheUser',
-            PASSWORD: 'NopeNopeNopeNope',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
             SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
 
             PREFIX: 'myprefix',
             TIMEZONE: 'Australia/Brisbane',
             SDE_CONNECTION: 'some_destination.gdb',
-            REPROJECT_CODE: 'GDA2020 MGA Zone 56',
+            DESTINATION_CRS: 'GDA2020 MGA Zone 56',
             'destinationTimestamp': time.dummyTimestamp()
         }
         
