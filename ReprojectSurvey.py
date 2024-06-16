@@ -27,9 +27,12 @@ def buildReprojector(configSupplied):
 
 
 def main():
-    messenger.Messenger().info(f'{NAME} version {VERSION}')
+    mainMessenger = messenger.Messenger()
+    mainMessenger.info(f'{NAME} version {VERSION}')
 
     configSupplied = config.Config().map()
+    mainMessenger.info(f'Parameters supplied: {configSupplied}')
+    
     reprojector = buildReprojector(configSupplied)
     reprojector.reproject()
 

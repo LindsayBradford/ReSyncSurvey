@@ -7,7 +7,6 @@
 # V1: Initial release
 
 import arcpy
-from support.messenger import Messenger
 
 # Context keys
 
@@ -41,6 +40,7 @@ MANDATORY_PARAMETERS = [
     TIMEZONE,
     PORTAL,
     DESTINATION_CRS,
+    DESTINATION_GEOGRAPHIC_TRANSFORMATIONS,
     SERVICE_URL
 ]
 
@@ -66,13 +66,11 @@ def produceParameters():
         params[TIMEZONE] = arcpy.GetParameterAsText(3)
         params[PORTAL] = arcpy.GetParameterAsText(4)
         params[DESTINATION_CRS] = arcpy.GetParameterAsText(5) 
-        params[DESTINATION_GEOGRAPHIC_TRANSFORMATIONS] = arcpy.GetParameterAsText(5)  
+        params[DESTINATION_GEOGRAPHIC_TRANSFORMATIONS] = arcpy.GetParameterAsText(6)  
         params[PORTAL_USER_NAME] = arcpy.GetParameterAsText(7)
         params[PORTAL_PASSWORD] = arcpy.GetParameterAsText(8)
     else:
         raise SystemExit(f"Expected parameter(s) [{arcpy.GetArgumentCount()}] were not supplied")
-    
-    Messenger().info(f'Parameters supplied: [{params}]')
 
     return params
         
