@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Name: support/survey_reprojector.py
-# Purpose: To reproject an AGOL survey, then save to target geodatabase
+# Name: support/reprojector.py
+# Purpose: To reproject an AGOL surveyinto a target geodatabase
 # Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
 # Release History:
 # ---------------------------------------------------------------------------
@@ -9,9 +9,9 @@
 
 from support.parameters import *
 import support.time as time
-import support.survey_replicator as replicator
+import support.extractor as extractor
 import support.transformer as transformer
-import support.appender as appender
+import support.loader as loader
 from support.messenger import Messenger
 
 import arcpy
@@ -23,14 +23,14 @@ class SurveyReprojector:
 
         self.initialiseContext()
         
-        self.replicator = \
-            replicator.NullSurveyReplicator(parametersSupplied).withContext(self.context)
+        self.extractor = \
+            extractor.NullSurveyReplicator(parametersSupplied).withContext(self.context)
         
-        self.reprojector = \
+        self.transformer = \
             transformer.NullTransformer(parametersSupplied).withContext(self.context)
 
-        self.appender = \
-            appender.NullAppender(parametersSupplied).withContext(self.context)
+        self.loader = \
+            loader.NullLoader(parametersSupplied).withContext(self.context)
 
 
     def initialiseContext(self):
@@ -41,18 +41,18 @@ class SurveyReprojector:
         self.context[CLEANUP_OPERATIONS] = {}
         self.messenger.debug(f'Context: [{self.context}]')
 
-    def usingSurveyReplicator(self, replicator):
-        self.replicator = replicator.withContext(self.context)
+    def usingExtractor(self, extractor):
+        self.extractor = extractor.withContext(self.context)
         return self
 
 
-    def usingReprojector(self, transformer):
-        self.reprojector = transformer.withContext(self.context)
+    def usingTransformer(self, transformer):
+        self.transformer = transformer.withContext(self.context)
         return self
 
 
-    def usingAppender(self, appender):
-        self.appender = appender.withContext(self.context)
+    def usingLoader(self, loader):
+        self.loader = loader.withContext(self.context)
         return self
 
 
@@ -67,13 +67,13 @@ class SurveyReprojector:
 
     def tryReprojection(self):
         self.context[SECTION] = 'Extraction'
-        surveyGDB = self.replicator.replicate()
+        surveyGDB = self.extractor.extract()
 
         self.context[SECTION] = 'Transformation'
-        self.reprojector.transform(surveyGDB)
+        self.transformer.transform(surveyGDB)
 
         self.context[SECTION] = 'Loading'
-        self.appender.appendFrom(surveyGDB)
+        self.loader.loadFrom(surveyGDB)
 
 
     def handleException(self, ex):

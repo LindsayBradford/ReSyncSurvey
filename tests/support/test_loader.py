@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Name: tests/support/test_appender.py
-# Purpose: Testing harness for support/appender.py
+# Name: tests/support/test_loader.py
+# Purpose: Testing harness for support/loader.py
 # Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
 # Release History:
 # ---------------------------------------------------------------------------
@@ -13,7 +13,7 @@ import support.time as time
 import pytest
 from unittest.mock import patch
 
-from support.appender import SDEAppender
+from support.loader import ReprojectingSDEAppender
 
 
 class FakeArcpy():
@@ -51,10 +51,10 @@ class TestSDEAppender:
         fakeReplicatedGeodatabase = 'fakeReplicant.gdb'
         fakeArcpy = FakeArcpy()
         
-        transformerUnderTest = SDEAppender(parameters).withContext(context)
+        transformerUnderTest = ReprojectingSDEAppender(parameters).withContext(context)
         
-        with patch('support.appender.arcpy.SpatialReference', fakeArcpy.SpatialReference):
-            transformerUnderTest.appendFrom(fakeReplicatedGeodatabase)
+        with patch('support.loader.arcpy.SpatialReference', fakeArcpy.SpatialReference):
+            transformerUnderTest.loadFrom(fakeReplicatedGeodatabase)
 
         assert len(fakeArcpy.spatialReferenceInputs) == 2
         assert fakeArcpy.spatialReferenceInputs[0] == parameters[DESTINATION_CRS] # General env projection/transformation

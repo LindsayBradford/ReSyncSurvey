@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Name: tests/support/test_survey_replicator.py
-# Purpose: Testing harness for support/survey_replicator.py
+# Name: tests/support/test_reprojector.py
+# Purpose: Testing harness for support/reprojector.py
 # Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
 # Release History:
 # ---------------------------------------------------------------------------
 # V1: Initial release
 
 from support.parameters import *
-from support.survey_reprojector import SurveyReprojector
-from support.survey_replicator import NullSurveyReplicator
+from support.reprojector import SurveyReprojector
+from support.extractor import NullSurveyReplicator
 
 import pytest
 # from unittest.mock import patch
@@ -17,7 +17,7 @@ import pytest
 DUMMY_ENTRY = 'dummyentry'
 
 class FakeReplicator(NullSurveyReplicator):
-    def replicate(self):
+    def extract(self):
         self.context[DUMMY_ENTRY] = DUMMY_ENTRY
 
 
@@ -42,7 +42,7 @@ class TestSurveyReplicator:
         # when
 
         fakeReplicator = FakeReplicator(parameters)
-        reprojectorUnderTest = SurveyReprojector(parameters).usingSurveyReplicator(fakeReplicator)
+        reprojectorUnderTest = SurveyReprojector(parameters).usingExtractor(fakeReplicator)
         reprojectorUnderTest.reproject()
         
         # then
@@ -50,16 +50,11 @@ class TestSurveyReplicator:
         assert DUMMY_ENTRY in reprojectorUnderTest.context.keys()
         assert reprojectorUnderTest.context[DUMMY_ENTRY] == DUMMY_ENTRY
 
-        assert DUMMY_ENTRY in reprojectorUnderTest.replicator.context.keys()
-        assert reprojectorUnderTest.replicator.context[DUMMY_ENTRY] == DUMMY_ENTRY
+        assert DUMMY_ENTRY in reprojectorUnderTest.extractor.context.keys()
+        assert reprojectorUnderTest.extractor.context[DUMMY_ENTRY] == DUMMY_ENTRY
 
-        assert DUMMY_ENTRY in reprojectorUnderTest.reprojector.context.keys()
-        assert reprojectorUnderTest.reprojector.context[DUMMY_ENTRY] == DUMMY_ENTRY
+        assert DUMMY_ENTRY in reprojectorUnderTest.transformer.context.keys()
+        assert reprojectorUnderTest.transformer.context[DUMMY_ENTRY] == DUMMY_ENTRY
         
-        assert DUMMY_ENTRY in reprojectorUnderTest.appender.context.keys()
-        assert reprojectorUnderTest.appender.context[DUMMY_ENTRY] == DUMMY_ENTRY
-         
- 
-
-
-
+        assert DUMMY_ENTRY in reprojectorUnderTest.loader.context.keys()
+        assert reprojectorUnderTest.loader.context[DUMMY_ENTRY] == DUMMY_ENTRY

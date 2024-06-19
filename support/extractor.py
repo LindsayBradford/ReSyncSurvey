@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Name: support/survey_replicator.py
-# Purpose: To replicate a survey out of AGOL into a temporary file geodatabase
+# Name: support/extractor.py
+# Purpose: To extract a survey out of AGOL into a temp FGDB via replication
 # Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
 # Release History:
 # ---------------------------------------------------------------------------
@@ -11,13 +11,13 @@
 from support.parameters import *
 from support.messenger import Messenger
 import support.time as time
-import uuid
 
 import os
 import urllib, urllib.parse, urllib.request
 import getpass
 import json
 import tempfile
+import uuid
 import zipfile
 
 import arcpy
@@ -34,17 +34,17 @@ POLL_WAIT_SECONDS = 10
 from abc import ABC, abstractmethod
 
 
-class SurveyReplicator(ABC):
+class Extractor(ABC):
     @abstractmethod
     def withContext(self, context):
         pass
 
     @abstractmethod
-    def replicate(self):
+    def extract(self):
         return None
 
 
-class NullSurveyReplicator(SurveyReplicator):
+class NullSurveyReplicator(Extractor):
     def __init__(self, parametersSupplied):
         self.context = {}
         self.parameters = parametersSupplied
@@ -53,11 +53,11 @@ class NullSurveyReplicator(SurveyReplicator):
         self.context = context
         return self
     
-    def replicate(self):
+    def extract(self):
         return "<Nothing Replicated>"
     
 
-class AGOLSurveyReplicator(SurveyReplicator):
+class AGOLSurveyReplicator(Extractor):
     def __init__(self, parametersSupplied):
         self.context = {}
         self.messenger = Messenger()
@@ -69,7 +69,7 @@ class AGOLSurveyReplicator(SurveyReplicator):
         return self
 
 
-    def replicate(self):        
+    def extract(self):        
         self.messenger.info(f'Replicating survey at [{self.parameters[SERVICE_URL]}]')
         self.messenger.indent()
 

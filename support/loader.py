@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
 # Name: support/appender.py
-# Purpose: To append data from a temp file geodatabase into an SDE geodatabase
+# Purpose: Append data from a temp file geodatabase into an SDE geodatabase
 # Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
 # Release History:
 # ---------------------------------------------------------------------------
@@ -22,17 +22,17 @@ SECTION = 'ProcessSection'
 CLEANUP_OPERATIONS = 'CleanupOperations'
 EXISTING_TABLES = 'ExistingTables'
 
-class Appender(ABC):
+class Loader(ABC):
     @abstractmethod
     def withContext(self, context):
         pass
 
     @abstractmethod
-    def appendFrom(self, surveyGDB):
+    def loadFrom(self, surveyGDB):
         return None
 
 
-class NullAppender(Appender):
+class NullLoader(Loader):
     def __init__(self, parametersSupplied):
         self.context = {}
         self.parameters = parametersSupplied
@@ -43,11 +43,11 @@ class NullAppender(Appender):
         return self
 
 
-    def appendFrom(self, surveyGDB):
+    def loadFrom(self, surveyGDB):
         return f"<Nothing appended from Survey geodatabase {surveyGDB}>"
 
 
-class SDEAppender(Appender):
+class ReprojectingSDEAppender(Loader):
     def __init__(self, parametersSupplied):
         self.context = {}
         self.parameters = parametersSupplied
@@ -59,7 +59,7 @@ class SDEAppender(Appender):
         return self
 
 
-    def appendFrom(self, surveyGDB):
+    def loadFrom(self, surveyGDB):
         self.context[CLEANUP_OPERATIONS] = {}
 
         self.messenger.info(f'Applying CRS [{self.parameters[DESTINATION_CRS]}] as output coordinate system')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Name: tests/support/test_survey_replicator.py
-# Purpose: Testing harness for support/survey_replicator.py
+# Name: tests/support/test_extractor.py
+# Purpose: Testing harness for support/extractor.py
 # Author: Lindsay Bradford, Truii.com, 2024, based heaviy on syncSurvey
 # Release History:
 # ---------------------------------------------------------------------------
@@ -17,11 +17,10 @@ from support.parameters import *
 import pytest
 from unittest.mock import patch
 
-import json
 from urllib.request import HTTPSHandler
-from urllib.parse import unquote
 from pathlib import Path
-from support.survey_replicator import AGOLSurveyReplicator
+
+from support.extractor import AGOLSurveyReplicator
 
 class FakeZipFile():
     def __init__(self):
@@ -138,15 +137,15 @@ class TestAGOLSurveyReplicator:
         fakeZipFile = FakeZipFile()
 
         #TODO:  Can I shrink this to just referencing fakeZipFile once?
-        with patch('support.survey_replicator.urllib.request.urlopen', fakeHandler.open),\
-             patch('support.survey_replicator.zipfile.ZipFile.namelist', fakeZipFile.namelist),\
-             patch('support.survey_replicator.zipfile.ZipFile.extractall', fakeZipFile.extractall):
+        with patch('support.extractor.urllib.request.urlopen', fakeHandler.open),\
+             patch('support.extractor.zipfile.ZipFile.namelist', fakeZipFile.namelist),\
+             patch('support.extractor.zipfile.ZipFile.extractall', fakeZipFile.extractall):
             
             replicatorUnderTest = AGOLSurveyReplicator(parameters)
 
             # when
 
-            replicatorUnderTest.replicate()
+            replicatorUnderTest.extract()
 
             # then
 
@@ -178,13 +177,13 @@ class TestAGOLSurveyReplicator:
         validServiceInfo = Path('syncEnabledFeatureServiceInfo.json').read_text()
         fakeHandler = FakeBadCredentialsHttpsHandler().forParameters(parameters).withServiceInfo(validServiceInfo)
 
-        with patch('support.survey_replicator.urllib.request.urlopen', fakeHandler.open):
+        with patch('support.extractor.urllib.request.urlopen', fakeHandler.open):
             with pytest.raises(Exception) as e_info:
                 replicatorUnderTest = AGOLSurveyReplicator(parameters)
 
                 # when
 
-                replicatorUnderTest.replicate()
+                replicatorUnderTest.extract()
 
             # then
 

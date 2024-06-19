@@ -79,7 +79,7 @@ class TestConfig:
         for parameter in actualConfigMap:
             print(f'Config parameter [{parameter}] = [{actualConfigMap[parameter]}]')
 
-        assert len(actualConfigMap) == 6
+        assert len(actualConfigMap) == 7
         assert actualConfigMap[PREFIX] == 'min'
         assert actualConfigMap[SERVICE_URL] == 'https://yaddayaddayadda.com/rest-of-url'
 
@@ -101,7 +101,7 @@ class TestConfig:
         for parameter in actualConfigMap:
             print(f'Config parameter [{parameter}] = [{actualConfigMap[parameter]}]')
 
-        assert len(actualConfigMap) == 8
+        assert len(actualConfigMap) == 9
 
         assert actualConfigMap[PREFIX] == 'myprefix'
         assert actualConfigMap[PORTAL_USER_NAME] == 'TheUser'

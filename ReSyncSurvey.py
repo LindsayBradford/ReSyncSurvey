@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# ReprojectSurvey.py
+# ReSyncSurvey.py  - SyncSurvey with Reprojection
 # Author: Lindsay Bradford, Truii.com, 2024.
 # Release History:
 # ---------------------------------------------------------------------------
@@ -10,20 +10,21 @@
 from importlib import reload
 
 import support.config as config
-import support.survey_reprojector as reprojector
-import support.survey_replicator as replicator
+import support.reprojector as reprojector
+import support.extractor as extractor
 import support.transformer as transformer
-import support.appender as appender
+import support.loader as loader
 import support.messenger as messenger
 
 NAME='ReprojectSurvey'
 VERSION = '1.0'
 
 def buildReprojector(configSupplied):
+    # ETL sub-component dependenct injection
     return reprojector.SurveyReprojector(configSupplied).\
-                usingSurveyReplicator(replicator.AGOLSurveyReplicator(configSupplied)).\
-                usingReprojector(transformer.FGDBReprojectionTransformer(configSupplied)).\
-                usingAppender(appender.SDEAppender(configSupplied))
+                usingExtractor(extractor.AGOLSurveyReplicator(configSupplied)).\
+                usingTransformer(transformer.FGDBReprojectionTransformer(configSupplied)).\
+                usingLoader(loader.ReprojectingSDEAppender(configSupplied))
 
 
 def main():
@@ -42,9 +43,9 @@ def reloadModulesForArcGISPro():
     reload(messenger)
     reload(config)
     reload(reprojector)
-    reload(replicator)
+    reload(extractor)
     reload(transformer)
-    reload(appender)
+    reload(loader)
 
 
 if __name__ == '__main__':
