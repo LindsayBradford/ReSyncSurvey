@@ -1,5 +1,5 @@
 [project]
-name = "ReprojectSuvey"
+name = "ReSyncSuvey"
 version = "0.0.1"
 description = "Reproject Survey Utility Script"
 authors = ["Lindsay Bradford <lindsay.bradford@truii.com>"]

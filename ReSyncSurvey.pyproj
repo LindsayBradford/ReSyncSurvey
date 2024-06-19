@@ -3,14 +3,15 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>0e81eeaa-f6aa-4ac6-b052-43188150c902</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
+    <ProjectHome>
+    </ProjectHome>
     <StartupFile>ReSyncSurvey.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>ReprojectSurvey</Name>
-    <RootNamespace>ReprojectSurvey</RootNamespace>
+    <Name>ReSyncSurvey</Name>
+    <RootNamespace>ReSyncSurvey</RootNamespace>
     <TestFramework>pytest</TestFramework>
     <InterpreterId>Global|VisualStudio|v3-9-11-SeqwaterArcgisPro</InterpreterId>
     <UnitTestPattern>test*.py</UnitTestPattern>

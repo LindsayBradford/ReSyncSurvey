@@ -16,7 +16,7 @@ import support.transformer as transformer
 import support.loader as loader
 import support.messenger as messenger
 
-NAME='ReprojectSurvey'
+NAME='ReSyncSurvey'
 VERSION = '1.0'
 
 def buildReprojector(configSupplied):
