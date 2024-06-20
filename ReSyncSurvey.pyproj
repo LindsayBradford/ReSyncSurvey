@@ -33,6 +33,7 @@
     <Compile Include="ReSyncSurvey.py" />
     <Compile Include="support\loader.py" />
     <Compile Include="support\messenger.py" />
+    <Compile Include="support\arcpy_proxy.py" />
     <Compile Include="support\transformer.py" />
     <Compile Include="support\extractor.py" />
     <Compile Include="support\time.py" />

@@ -229,29 +229,28 @@ class FGDBReprojectionTransformer(Transformer):
         tableList = self.getSurveyTables(surveyGDB)
         self.messenger.debug(f'Survey table list: {tableList}')
 
-        self.disableEditorTracking(surveyGDB, tableList)
+        self.addSynchronisationFields(surveyGDB, tableList)
         self.setTimestampOnTables(surveyGDB, tableList)
         
         self.messenger.outdent()
         self.messenger.info(f'Done adding syncronization time to tables...')
 
 
-    def disableEditorTracking(self, surveyGDB, tableList):
-        self.messenger.info(f'Disabling editor tracking on tables...')
+    def addSynchronisationFields(self, surveyGDB, tableList):
+        self.messenger.info(f'Adding synchronisation fields on tables...')
         self.messenger.indent()
 
         for table in tableList:
             FQtable = os.path.join(surveyGDB, table)
-            #Disable Editor Tracking
             
             self.messenger.debug(f'Disabling Editor Tracking on table [{table}]')
             arcpy.management.DisableEditorTracking(FQtable)
-            #Add a synchronization field
 
+            self.messenger.debug(f'Adding synchronisation field on table [{table}]')
             arcpy.management.AddField(FQtable, 'SYS_TRANSFER_DATE', 'DATE')
 
         self.messenger.outdent()
-        self.messenger.info(f'Done disabling editor tracking on tables')
+        self.messenger.info(f'Done adding synchronisation fields on tables')
 
 
     def setTimestampOnTables(self, surveyGDB, tableList):

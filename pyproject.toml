@@ -1,7 +1,7 @@
 [project]
 name = "ReSyncSuvey"
-version = "0.0.1"
-description = "Reproject Survey Utility Script"
+version = "0.9"
+description = "Reprojecting Survey Synchronisation Script"
 authors = ["Lindsay Bradford <lindsay.bradford@truii.com>"]
 
 [project.dependencies]

@@ -20,7 +20,7 @@ NAME='ReSyncSurvey'
 VERSION = '1.0'
 
 def buildReprojector(configSupplied):
-    # ETL sub-component dependenct injection
+    # ETL sub-component dependency injection
     return reprojector.SurveyReprojector(configSupplied).\
                 usingExtractor(extractor.AGOLSurveyReplicator(configSupplied)).\
                 usingTransformer(transformer.FGDBReprojectionTransformer(configSupplied)).\

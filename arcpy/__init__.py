@@ -92,6 +92,13 @@ def GetArgumentCount():
 #    print(sys.argv[:argCount])
     return argCount - 1
 
+def GetMessages(type):
+    if type == 1:
+        return 'warning one\nwarning two'
+    if type == 2:
+        return 'error one\nerror two'
+    return ''
+
 
 def GetMessage(index):
     return messages[index]
@@ -133,3 +140,6 @@ def SpatialReference(CRS):
 
 def Statistics_analysis(tableName, workspace, analysisType):
     return None
+
+class ExecuteError(Exception):
+    '''Raise some random ExecuteError'''

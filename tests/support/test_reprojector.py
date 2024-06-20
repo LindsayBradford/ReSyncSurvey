@@ -14,12 +14,22 @@ from support.extractor import NullSurveyReplicator
 import pytest
 # from unittest.mock import patch
 
+import arcpy
+
 DUMMY_ENTRY = 'dummyentry'
 
 class FakeReplicator(NullSurveyReplicator):
     def extract(self):
         self.context[DUMMY_ENTRY] = DUMMY_ENTRY
 
+
+class FakeAttributeErrorReplicator(NullSurveyReplicator):
+    def extract(self):
+        raise AttributeError("Here's a randon attribute error")
+
+class FakeExecuteErrorReplicator(NullSurveyReplicator):
+    def extract(self):
+        raise arcpy.ExecuteError("Failed to execute. Parameters are not valid.")
 
 @pytest.mark.usefixtures("useTestDataDirectory", "resetArcpy", "resetMessengerSingleton")    
 class TestSurveyReplicator:
@@ -58,3 +68,60 @@ class TestSurveyReplicator:
         
         assert DUMMY_ENTRY in reprojectorUnderTest.loader.context.keys()
         assert reprojectorUnderTest.loader.context[DUMMY_ENTRY] == DUMMY_ENTRY
+
+        
+    def test_SurveyReprojector_ExecuteError_handled(self):
+        # given
+           
+        parameters = {
+            PORTAL: 'https://www.not.really.arcgis.com',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
+            SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
+
+            PREFIX: 'myprefix',
+            TIMEZONE: 'Australia/Brisbane',
+            SDE_CONNECTION: 'some_destination.gdb',
+            DESTINATION_CRS: 'WSG84-to-GDA2020-standin',
+        }
+       
+        # when
+
+        fakeExecuteErrrorReplicator = FakeExecuteErrorReplicator(parameters)
+        reprojectorUnderTest = SurveyReprojector(parameters).usingExtractor(fakeExecuteErrrorReplicator)
+        
+        with pytest.raises(SystemExit) as sysExitInfo:
+            reprojectorUnderTest.reproject()
+            
+        # then
+        
+        assert str(sysExitInfo.value).startswith('Failed to execute')
+
+
+    def test_SurveyReprojector_AttributeError_handled(self):
+        # given
+           
+        parameters = {
+            PORTAL: 'https://www.not.really.arcgis.com',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
+            SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
+
+            PREFIX: 'myprefix',
+            TIMEZONE: 'Australia/Brisbane',
+            SDE_CONNECTION: 'some_destination.gdb',
+            DESTINATION_CRS: 'WSG84-to-GDA2020-standin',
+        }
+       
+        # when
+
+        fakeAttributeErrrorReplicator = FakeAttributeErrorReplicator(parameters)
+        reprojectorUnderTest = SurveyReprojector(parameters).usingExtractor(fakeAttributeErrrorReplicator)
+        
+        with pytest.raises(SystemExit) as sysExitInfo:
+            reprojectorUnderTest.reproject()
+            
+        # then
+        
+        assert str(sysExitInfo.value).startswith("Here's a randon attribute error")
+            
