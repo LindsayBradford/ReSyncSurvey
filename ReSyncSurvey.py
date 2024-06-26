@@ -9,6 +9,7 @@
 
 from importlib import reload
 
+import support.arcpy_proxy as arcpy_proxy
 import support.config as config
 import support.reprojector as reprojector
 import support.extractor as extractor
@@ -40,6 +41,7 @@ def main():
 
 def reloadModulesForArcGISPro():
     # https://gis.stackexchange.com/questions/91112/refreshing-imported-modules-in-arcgis-python-toolbox
+    reload(arcpy_proxy)
     reload(messenger)
     reload(config)
     reload(reprojector)

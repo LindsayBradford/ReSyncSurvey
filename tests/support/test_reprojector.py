@@ -12,7 +12,7 @@ from support.reprojector import SurveyReprojector
 from support.extractor import NullSurveyReplicator
 
 import pytest
-# from unittest.mock import patch
+from unittest.mock import patch
 
 import arcpy
 
@@ -30,6 +30,9 @@ class FakeAttributeErrorReplicator(NullSurveyReplicator):
 class FakeExecuteErrorReplicator(NullSurveyReplicator):
     def extract(self):
         raise arcpy.ExecuteError("Failed to execute. Parameters are not valid.")
+    
+def FakeArcpyGetParameterInfo():
+    return ['param1value', 'param2value']
 
 @pytest.mark.usefixtures("useTestDataDirectory", "resetArcpy", "resetMessengerSingleton")    
 class TestSurveyReplicator:
@@ -70,7 +73,7 @@ class TestSurveyReplicator:
         assert reprojectorUnderTest.loader.context[DUMMY_ENTRY] == DUMMY_ENTRY
 
         
-    def test_SurveyReprojector_ExecuteError_handled(self):
+    def test_SurveyReprojector_CmdLine_ExecuteError_handled(self):
         # given
            
         parameters = {
@@ -98,7 +101,7 @@ class TestSurveyReplicator:
         assert str(sysExitInfo.value).startswith('Failed to execute')
 
 
-    def test_SurveyReprojector_AttributeError_handled(self):
+    def test_SurveyReprojector_CmdLine_AttributeError_handled(self):
         # given
            
         parameters = {
@@ -124,4 +127,34 @@ class TestSurveyReplicator:
         # then
         
         assert str(sysExitInfo.value).startswith("Here's a randon attribute error")
+
+
+    def test_SurveyReprojector_ArcGISPro_ExecuteError_handled(self):
+        # given
+           
+        parameters = {
+            PORTAL: 'https://www.not.really.arcgis.com',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
+            SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
+
+            PREFIX: 'myprefix',
+            TIMEZONE: 'Australia/Brisbane',
+            SDE_CONNECTION: 'some_destination.gdb',
+            DESTINATION_CRS: 'WSG84-to-GDA2020-standin',
+        }
+       
+        # when
+
+        fakeExecuteErrrorReplicator = FakeExecuteErrorReplicator(parameters)
+        reprojectorUnderTest = SurveyReprojector(parameters).usingExtractor(fakeExecuteErrrorReplicator)
+        
+        with patch('support.loader.arcpy.GetParameterInfo', FakeArcpyGetParameterInfo),\
+            pytest.raises(arcpy.ExecuteError) as exInfo:
+
+            reprojectorUnderTest.reproject()
+            
+        # then
+        
+        assert str(exInfo.value).startswith("('Aborting script")
             

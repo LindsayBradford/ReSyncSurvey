@@ -115,6 +115,8 @@ def GetParameterAsText(parmeterIndex):
 def SetParameterAsText(parmeterIndex, text):
     sys.argv[parmeterIndex + 1] = text
 
+def GetParameterInfo():
+    return None
 
 def GetSigninToken():
     return None

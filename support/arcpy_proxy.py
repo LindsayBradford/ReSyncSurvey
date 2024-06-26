@@ -11,6 +11,16 @@ import support.time as time
 
 import arcpy
 
+def runningWithinToolbox():
+    if arcpy.GetParameterInfo():
+        return True
+    return False
+
+
+def raiseExecuteError(message, baseException = None):
+    raise arcpy.ExecuteError(message, baseException)
+    
+
 def cleanupAppends(sdeConnection, processTime, tables):
     arcpy.env.workspace = sdeConnection
     timestamp = time.createTimestampText(processTime)

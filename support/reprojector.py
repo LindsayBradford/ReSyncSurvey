@@ -71,8 +71,14 @@ class SurveyReprojector:
             
 
     def abortIfRequired(self):
-        if self.abortingException != None:
-            self.messenger.error(f'Aborting script due to unrecoverable error [{self.abortingException}]')
+        if self.abortingException == None:
+            return
+
+        message = f'Aborting script due to unrecoverable error [{self.abortingException}]'
+        if arcpy_proxy.runningWithinToolbox():
+            arcpy_proxy.raiseExecuteError(message, self.abortingException)
+        else:
+            self.messenger.error(message)
             sys.exit(self.abortingException)
 
 
