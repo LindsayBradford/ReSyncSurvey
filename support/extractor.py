@@ -63,11 +63,9 @@ class AGOLSurveyReplicator(Extractor):
         self.messenger = Messenger()
         self.parameters = parametersSupplied
 
-
     def withContext(self, context):
         self.context = context
         return self
-
 
     def extract(self):        
         self.messenger.info(f'Replicating survey at [{self.parameters[SERVICE_URL]}]')
@@ -80,12 +78,10 @@ class AGOLSurveyReplicator(Extractor):
         self.messenger.info(f'Done replicating survey at [{self.parameters[SERVICE_URL]}]')
 
         return replicatedSurveyPath
- 
 
     def logIntoSurvey(self):
         self.retrieveLoginToken()
         self.checkServiceHasSyncEnabled()
-
 
     def checkServiceHasSyncEnabled(self):
         self.messenger.info(f'Checking service has Sync capability...')
@@ -99,7 +95,6 @@ class AGOLSurveyReplicator(Extractor):
 
         self.messenger.info(f'Service confirmed as having Sync capability.')
         self.messenger.outdent()
-        
 
     def retrieveLoginToken(self):
         self.messenger.info(f'Retrieving login token for [{self.parameters[SERVICE_URL]}]')
@@ -116,7 +111,6 @@ class AGOLSurveyReplicator(Extractor):
         self.messenger.info(f'Login token [{self.context[TOKEN]}] retrieved')
         
         self.messenger.outdent()
-
 
     def getPortalToken(self):
         '''Gets a token from ArcGIS Online/Portal with the given username/password'''
@@ -146,7 +140,6 @@ class AGOLSurveyReplicator(Extractor):
 
         self.context[SERVICE_INFO] = json.loads(response)
 
-
     def generateTokenRequestParams(self):
         params = self.parameters
 
@@ -164,7 +157,6 @@ class AGOLSurveyReplicator(Extractor):
         
         return parameters
 
-
     def downloadSurvey(self):
         self.messenger.info(f'Downloading survey replica...')
         self.messenger.indent()
@@ -177,7 +169,6 @@ class AGOLSurveyReplicator(Extractor):
         self.messenger.outdent()
 
         return replicaFileGeodatabasePath
-
 
     def generateReplicateRequestUrl(self):
         # See https://developers.arcgis.com/rest/services-reference/enterprise/create-replica/
@@ -210,7 +201,6 @@ class AGOLSurveyReplicator(Extractor):
         
         createReplStream = urllib.request.urlopen(createReplicaURL, encodedUrlParams)
         return createReplStream
-
 
     def pollForResponseUrl(self, createReplStream):
         # This is asynchronous, so we get a jobId to check periodically for completion
@@ -255,7 +245,6 @@ class AGOLSurveyReplicator(Extractor):
                 
         self.messenger.outdent()
         return resultUrl
-
 
     def downloadReplicaFileGeodatabase(self, resultUrl):
         tokenisedResultUrl = f"{resultUrl}?token={self.context[TOKEN]}"

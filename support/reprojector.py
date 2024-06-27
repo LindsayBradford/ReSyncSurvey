@@ -35,7 +35,6 @@ class SurveyReprojector:
         self.loader = \
             loader.NullLoader(parametersSupplied).withContext(self.context)
 
-
     def initialiseContext(self):
         self.context = {}
         self.context[PROCESS_TIME] = time.getUTCTimestamp(self.parameters[TIMEZONE])
@@ -44,16 +43,13 @@ class SurveyReprojector:
         self.context[CLEANUP_OPERATIONS] = {}
         self.messenger.debug(f'Context: [{self.context}]')
 
-
     def usingExtractor(self, extractor):
         self.extractor = extractor.withContext(self.context)
         return self
 
-
     def usingTransformer(self, transformer):
         self.transformer = transformer.withContext(self.context)
         return self
-
 
     def usingLoader(self, loader):
         self.loader = loader.withContext(self.context)
@@ -84,7 +80,6 @@ class SurveyReprojector:
             self.messenger.error(message)
             sys.exit(self.abortingException)
 
-
     def tryReprojection(self):
         self.context[SECTION] = 'Extraction'
         surveyGDB = self.extractor.extract()
@@ -96,7 +91,6 @@ class SurveyReprojector:
         self.loader.loadFrom(surveyGDB)
 
         arcpy_proxy.Delete(surveyGDB)    
-        
 
     def handleException(self, ex):
         exceptionType = type(ex).__name__
@@ -130,7 +124,6 @@ class SurveyReprojector:
         self.messenger.outdent()
         self.abortingException = ex
 
-
     def cleanup(self):
         self.messenger.info(f'Cleaning up...')
         self.messenger.indent()
@@ -146,16 +139,9 @@ class SurveyReprojector:
 
         self.messenger.outdent()
         self.messenger.info(f'Done cleaning up')
-        
-        
 
     def cleanupAppends(self, tables):
         arcpy_proxy.cleanupAppends(self.parameters[SDE_CONNECTION], self.context[PROCESS_TIME], tables)
 
-
     def cleanupCreatedTables(self):
         arcpy_proxy.cleanupCreatedTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
-
-
-
-

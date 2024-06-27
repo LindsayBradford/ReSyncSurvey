@@ -10,7 +10,6 @@
 from support.parameters import *
 from support.messenger import Messenger
 
-
 from abc import ABC, abstractmethod
 import support.time as time
 import support.arcpy_proxy as arcpy_proxy
@@ -50,7 +49,6 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger = Messenger()
         self.parameters = parametersSupplied
 
-
     def transform(self, surveyGDB):
         self.messenger.info(f'Transforming survey at [{surveyGDB}]...')
         self.messenger.indent()
@@ -62,7 +60,6 @@ class FGDBReprojectionTransformer(Transformer):
 
         self.messenger.outdent()
         self.messenger.info(f'Done transforming survey at [{surveyGDB}]')
-
 
     def checkExistingData(self):
         self.messenger.info(f'Checking existing data via [{self.parameters[SDE_CONNECTION]}]')
@@ -82,7 +79,6 @@ class FGDBReprojectionTransformer(Transformer):
 
         self.messenger.outdent()
         self.messenger.info(f'Done checking existing data via [{self.parameters[SDE_CONNECTION]}]')
-
 
     def getLastSynchronizationTime(self, tableList):
         # Looks at the existing records in the SDE and returns the latest synchronization time
@@ -128,7 +124,6 @@ class FGDBReprojectionTransformer(Transformer):
     def lastPartOfTableName(table):
         return table.split(".")[-1]
 
-
     def filterRecords(self, surveyGDB):
         '''Filter the records to those that need to be updated'''
         #Note - This excludes new entries that are *after* the timestamp
@@ -168,8 +163,6 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.outdent()
         self.messenger.info(f'Done filtering records to new set since last synchronised...')
 
-
-
     def addTimeStamp(self, surveyGDB):
         # Disables editor tracking, adds and populates the timestamp field
 
@@ -186,7 +179,6 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.outdent()
         self.messenger.info(f'Done adding syncronization time to tables...')
 
-
     def addSynchronisationFields(self, surveyGDB, tableList):
         self.messenger.info(f'Adding synchronisation fields on tables...')
         self.messenger.indent()
@@ -202,7 +194,6 @@ class FGDBReprojectionTransformer(Transformer):
 
         self.messenger.outdent()
         self.messenger.info(f'Done adding synchronisation fields on tables')
-
 
     def setTimestampOnTables(self, surveyGDB, tableList):
         timestamp = self.context[PROCESS_TIME]
@@ -221,7 +212,6 @@ class FGDBReprojectionTransformer(Transformer):
 
         self.messenger.outdent()
         self.messenger.info(f'Done setting timestamps on tables')
- 
 
     def addKeyFields(self, workspace):
         '''To enable transfer of attachments with repeats, we need an additional GUID field to serve as a lookup'''

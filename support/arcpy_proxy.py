@@ -112,7 +112,7 @@ def GetMessages(severity):
     return arcpy.GetMessages(severity)
 
 def Delete(dataElement):
-    messenger.info(f'Deleting [{dataElement}] via arcpy')
+    messenger.info(f'Deleting [{dataElement}]')
     arcpy.management.Delete(dataElement)
 
 def isExecuteError(exception):
