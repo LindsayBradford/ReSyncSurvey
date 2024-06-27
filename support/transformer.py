@@ -13,6 +13,7 @@ from support.messenger import Messenger
 
 from abc import ABC, abstractmethod
 import support.time as time
+import support.arcpy_proxy as arcpy_proxy
 import os
 import uuid
 import arcpy
@@ -67,7 +68,7 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.info(f'Checking existing data via [{self.parameters[SDE_CONNECTION]}]')
         self.messenger.indent()
 
-        existingTables = self.getSurveyTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
+        existingTables = arcpy_proxy.getSurveyTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
         if len(existingTables) > 0:
             self.getLastSynchronizationTime(existingTables)
             if self.context[LAST_SYNC_TIME] != None:
@@ -81,56 +82,6 @@ class FGDBReprojectionTransformer(Transformer):
 
         self.messenger.outdent()
         self.messenger.info(f'Done checking existing data via [{self.parameters[SDE_CONNECTION]}]')
-
-
-    def getSurveyTables(self, workspace, prefix=''):
-        originalWorkspace = arcpy.env.workspace
-        arcpy.env.workspace = workspace
-        
-        tables = self.getSurveyTablesFromCurrentWorkspace()
-
-        arcpy.env.workspace = originalWorkspace
-        return tables
-
-
-    def getSurveyTablesFromCurrentWorkspace(self, prefix=''):
-        #This is used in 2 contexts:
-        #Downloaded GDB - tables have no prefix
-        #Enterprise GDB - prefix is added to table name
-        #The full table name (i.e. GDB.SCHEMA.NAME) is returned, so prefix is in the middle
-        wildcard = f'*{prefix}*' if prefix != '' else '*'
-        #List the Feature Classes & Tables
-        #Tables also returns Attachment tables
-        
-        self.messenger.info(f'Applying pattern match ["{wildcard}"] for table search at [{arcpy.env.workspace}]')
-
-        featureClasses = arcpy.ListFeatureClasses(wildcard)
-        tables = arcpy.ListTables(wildcard)
-
-        if featureClasses != None:
-            self.messenger.debug(f'Found {len(featureClasses)} matching feature classes')
-        if tables != None:
-            self.messenger.debug(f'Found {len(tables)} matching tables')
-
-        #Loop through the tables, checking for:
-        #1) Is this an attachment table?
-        #2) Does the prefix actually match the prefix term exactly?
-        
-        allTables = []
-        if featureClasses != None:
-            allTables.extend(featureClasses)
-        if tables != None:
-            allTables.extend(tables)
-        
-        outTables = []
-        for t in allTables:
-            tableName = t.split('.')[-1]
-            nameParts = tableName.split('_')
-            if '__ATTACH' not in t:
-                if nameParts[0] == prefix or prefix == '':
-                    outTables.append(t)
-
-        return outTables
 
 
     def getLastSynchronizationTime(self, tableList):
@@ -192,7 +143,7 @@ class FGDBReprojectionTransformer(Transformer):
         arcpy.env.workspace = surveyGDB
         
         nowText = time.createTimestampText(self.context[PROCESS_TIME])
-        tableList = self.getSurveyTables(surveyGDB)
+        tableList = arcpy_proxy.getSurveyTables(surveyGDB)
         dateField = arcpy.AddFieldDelimiters(surveyGDB, "CreationDate")
         excludeStatement = "CreationDate > date '{1}'".format(dateField, nowText)
         if LAST_SYNC_TIME in self.context.keys() and self.context[LAST_SYNC_TIME] != None:
@@ -226,7 +177,7 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.indent()
 
         arcpy.env.workspace = surveyGDB
-        tableList = self.getSurveyTables(surveyGDB)
+        tableList = arcpy_proxy.getSurveyTables(surveyGDB)
         self.messenger.debug(f'Survey table list: {tableList}')
 
         self.addSynchronisationFields(surveyGDB, tableList)

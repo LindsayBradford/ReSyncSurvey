@@ -59,16 +59,19 @@ class SurveyReprojector:
         self.loader = loader.withContext(self.context)
         return self
 
-
     def reproject(self):
         try:
             self.tryReprojection()
+            self.noDestinationCleanupRequired()
         except Exception as ex:
             self.handleException(ex)
         finally:
             self.cleanup()
             self.abortIfRequired()
             
+    def noDestinationCleanupRequired(self):
+        self.context[CLEANUP_OPERATIONS].pop('append', None)
+        self.context[CLEANUP_OPERATIONS].pop('createTables', None)
 
     def abortIfRequired(self):
         if self.abortingException == None:
@@ -92,6 +95,8 @@ class SurveyReprojector:
         self.context[SECTION] = 'Loading'
         self.loader.loadFrom(surveyGDB)
 
+        arcpy_proxy.Delete(surveyGDB)    
+        
 
     def handleException(self, ex):
         exceptionType = type(ex).__name__
@@ -133,10 +138,11 @@ class SurveyReprojector:
         operations = self.context[CLEANUP_OPERATIONS].keys()
         if 'append' in operations:
             self.messenger.info(f'Cleaning up appended rows...')
-            self.cleanupAppends(operations['append'])
+            self.cleanupAppends(self.context[CLEANUP_OPERATIONS]['append'])
         if 'createTables' in operations:
             self.messenger.info(f'Cleaning up created tables...')
             self.cleanupCreatedTables()
+        
 
         self.messenger.outdent()
         self.messenger.info(f'Done cleaning up')
@@ -144,7 +150,7 @@ class SurveyReprojector:
         
 
     def cleanupAppends(self, tables):
-        arcpy_proxy.cleanupAppends(self.parameters[SDE_CONNECTION], self.processTime, tables)
+        arcpy_proxy.cleanupAppends(self.parameters[SDE_CONNECTION], self.context[PROCESS_TIME], tables)
 
 
     def cleanupCreatedTables(self):

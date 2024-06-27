@@ -105,7 +105,7 @@ class ReprojectingSDEAppender(Loader):
             self.messenger.info('Tables were found in destination workspace. Skipping table creation')
             return
 
-        self.context[SECTION] = 'Making Tables'
+        self.context[SECTION] = 'Creating Tables'
         self.createTablesAtDestination(surveyGDB)
         
         #TODO:  get a better bead on CLEANUP_OPEERATIONS usage...
