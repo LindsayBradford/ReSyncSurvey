@@ -17,8 +17,8 @@ from unittest.mock import patch
 from support.transformer import FGDBReprojectionTransformer
 
 ResponseType = Enum('ResponseType', \
-                    ['NO_TABLES', 'NO_DESTINATION_TABLES', \
-                     'NO_REPLICA_TABLES', 'MATCHING_REPLICA_DESTINATION_TABLES'])
+    ['NO_TABLES', 'NO_DESTINATION_TABLES', 'NO_REPLICA_TABLES', \
+    'MATCHING_REPLICA_DESTINATION_TABLES', 'MISMATCHING_TABLES'])
 
 class FakeCursor(arcpy.da.Cursor):
     def __init__(self):
@@ -45,7 +45,6 @@ class FakeArcpyBridge():
         self.featureClasses = []
 
         self.GetCountCalled = 0
-
     
     def usingReplicaGeodatabase(self, replicaGeodatabase):
         self.params['replica'] = replicaGeodatabase
@@ -66,17 +65,23 @@ class FakeArcpyBridge():
     def withMatchingTables(self):
         self.responseType = ResponseType.MATCHING_REPLICA_DESTINATION_TABLES
         return self
-
+    
+    def withMismatchingTables(self):
+        self.responseType = ResponseType.MISMATCHING_TABLES
+        return self
 
     def ListTables(self, wildcard):
         self.ListTablesCalled += 1
         if arcpy.env.workspace == self.params['replica']:
             if self.responseType == ResponseType.MATCHING_REPLICA_DESTINATION_TABLES or\
-                self.responseType == ResponseType.NO_DESTINATION_TABLES:
+                self.responseType == ResponseType.NO_DESTINATION_TABLES or \
+                self.responseType == ResponseType.MISMATCHING_TABLES:
                 return ['table1', 'table2']
         if arcpy.env.workspace == self.params[SDE_CONNECTION]:
             if self.responseType == ResponseType.MATCHING_REPLICA_DESTINATION_TABLES:
                 return [self.params[PREFIX] + '_table1', self.params[PREFIX] + '_table2']
+            if self.responseType == ResponseType.MISMATCHING_TABLES:
+                return [self.params[PREFIX] + '_table3']
         return []
 
     def ListFeatureClasses(self, wildcard):
@@ -84,11 +89,14 @@ class FakeArcpyBridge():
 
         if arcpy.env.workspace == self.params['replica']:
             if self.responseType == ResponseType.MATCHING_REPLICA_DESTINATION_TABLES or\
-                self.responseType == ResponseType.NO_DESTINATION_TABLES:
+                self.responseType == ResponseType.NO_DESTINATION_TABLES or \
+                self.responseType == ResponseType.MISMATCHING_TABLES:
                 return ['featureClass1', 'featureClass2']
         if arcpy.env.workspace == self.params[SDE_CONNECTION]:
             if self.responseType == ResponseType.MATCHING_REPLICA_DESTINATION_TABLES:
                 return [self.params[PREFIX] + '_featureClass1', self.params[PREFIX] + '_featureClass2']
+            if self.responseType == ResponseType.MISMATCHING_TABLES:
+                return [self.params[PREFIX] + '_featureClass3']
         return []
     
     def GetCount(self, tableName):
@@ -100,6 +108,8 @@ class FakeArcpyBridge():
         if arcpy.env.workspace == self.params[SDE_CONNECTION]:
             if self.responseType == ResponseType.MATCHING_REPLICA_DESTINATION_TABLES:
                 return [2]
+            if self.responseType == ResponseType.MISMATCHING_TABLES:
+                return [1]
         return [0]
     
     def SearchCursor(self, tableName, columns):
@@ -107,7 +117,6 @@ class FakeArcpyBridge():
         cursor.timestamp = self.params['destinationTimestamp']
         return cursor
 
-    
     def Statistics_analysis(self, tableName, workspace, analysisType):
         if arcpy.env.workspace == self.params[SDE_CONNECTION]:
             if self.responseType == ResponseType.MATCHING_REPLICA_DESTINATION_TABLES:
@@ -152,7 +161,6 @@ class TestFGDReprojectionTransformer:
         assert fakeBridge.ListTablesCalled == 3
         assert fakeBridge.ListFeatureClassesCalled == 3
 
-
     def test_FGDBReprojectionTransformer_transform_no_destination_data(self):
         # given
            
@@ -189,7 +197,6 @@ class TestFGDReprojectionTransformer:
         assert fakeBridge.ListTablesCalled == 3
         assert fakeBridge.ListFeatureClassesCalled == 3
 
-
     def test_FGDBReprojectionTransformer_transform_matching_tables(self):
         # given
            
@@ -224,5 +231,46 @@ class TestFGDReprojectionTransformer:
             transformerUnderTest = FGDBReprojectionTransformer(parameters).withContext(context)
             transformerUnderTest.transform(fakeReplicatedGeodatabase)
             
-        assert fakeBridge.ListTablesCalled == 3
-        assert fakeBridge.ListFeatureClassesCalled == 3
+        assert fakeBridge.ListTablesCalled == 4
+        assert fakeBridge.ListFeatureClassesCalled == 4
+
+    def test_FGDBReprojectionTransformer_transform_mismatching_tables(self):
+        # given
+           
+        parameters = {
+            PORTAL: 'https://www.not.really.arcgis.com',
+            PORTAL_USER_NAME: 'TheUser',
+            PORTAL_PASSWORD: 'NopeNopeNopeNope',
+            SERVICE_URL: 'https://yaddayaddayadda.com/rest-of-url',
+
+            PREFIX: 'myprefix',
+            TIMEZONE: 'Australia/Brisbane',
+            SDE_CONNECTION: 'some_destination.gdb',
+            DESTINATION_CRS: 'GDA2020 MGA Zone 56',
+            'destinationTimestamp': time.dummyTimestamp()
+        }
+        
+        context = {
+            PROCESS_TIME: time.getUTCTimestamp(parameters[TIMEZONE])    
+        }
+        
+        fakeReplicatedGeodatabase = 'fakeReplicant.gdb'
+
+        fakeBridge = FakeArcpyBridge(parameters).\
+                        usingReplicaGeodatabase(fakeReplicatedGeodatabase).\
+                        withMismatchingTables()
+        
+        with patch('support.transformer.arcpy.ListFeatureClasses', fakeBridge.ListFeatureClasses),\
+             patch('support.transformer.arcpy.ListTables', fakeBridge.ListTables),\
+             patch('support.transformer.arcpy.management.GetCount', fakeBridge.GetCount),\
+             patch('support.transformer.arcpy.da.SearchCursor', fakeBridge.SearchCursor):
+             
+            with pytest.raises(Exception) as e_info:
+
+                transformerUnderTest = FGDBReprojectionTransformer(parameters).withContext(context)
+                transformerUnderTest.transform(fakeReplicatedGeodatabase)
+            
+            assert fakeBridge.ListTablesCalled == 2
+            assert fakeBridge.ListFeatureClassesCalled == 2
+            assert 'Mismatch of expected destination tables to extracted tables' in str(e_info.value)
+

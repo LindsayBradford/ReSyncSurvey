@@ -54,7 +54,7 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.info(f'Transforming survey at [{surveyGDB}]...')
         self.messenger.indent()
 
-        self.checkExistingData()
+        self.checkExistingData(surveyGDB)
         self.filterRecords(surveyGDB)
         self.addTimeStamp(surveyGDB)
         self.addKeyFields(surveyGDB)
@@ -62,12 +62,30 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.outdent()
         self.messenger.info(f'Done transforming survey at [{surveyGDB}]')
 
-    def checkExistingData(self):
+    def checkExistingData(self, surveyGDB):
         self.messenger.info(f'Checking existing data via [{self.parameters[SDE_CONNECTION]}]')
         self.messenger.indent()
 
         existingDestinationTables = self.arcpyProxy.getSurveyTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
+
         if len(existingDestinationTables) > 0:
+            existingExtractedTables = self.arcpyProxy.getSurveyTables(surveyGDB)
+        
+            tablesMatched = 0
+            for extractedTable in existingExtractedTables:
+                expectedDestinationTable = f'{self.parameters[PREFIX]}_{extractedTable}'
+                if expectedDestinationTable not in existingDestinationTables:
+                    self.messenger.warn(f'Extracted table [{extractedTable}] has no equivalent [{expectedDestinationTable}] in destination workspeace [{self.parameters[SDE_CONNECTION]}]')
+                else:
+                    tablesMatched += 1
+                    self.messenger.debug(f'Extracted table [{extractedTable}] has equivalent [{expectedDestinationTable}] in destination workspeace [{self.parameters[SDE_CONNECTION]}]')
+                    
+
+            if tablesMatched != len(existingDestinationTables):
+                errorMsg = 'Mismatch of expected destination tables to extracted tables detected.' 
+                self.messenger.error(errorMsg)
+                self.arcpyProxy.raiseExecuteError(errorMsg)
+
             self.getLastSynchronizationTime(existingDestinationTables)
             if self.context[LAST_SYNC_TIME] != None:
                 self.messenger.info(f'Last synchronisation time established [{time.createTimestampText(self.context[LAST_SYNC_TIME])}]')
