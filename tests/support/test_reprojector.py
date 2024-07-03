@@ -206,8 +206,8 @@ class TestSurveyReprojecor:
         reprojectorUnderTest = SurveyReprojector(parameters).usingLoader(fakeLoader)
        
         # when
-        with patch('support.reprojector.arcpy_proxy.cleanupAppends', fakeProxy.cleanupAppends), \
-            patch('support.reprojector.arcpy_proxy.cleanupCreatedTables', fakeProxy.cleanupCreatedTables), \
+        with patch('support.reprojector.arcpy_proxy.ArcpyProxy.cleanupAppends', fakeProxy.cleanupAppends), \
+            patch('support.reprojector.arcpy_proxy.ArcpyProxy.cleanupCreatedTables', fakeProxy.cleanupCreatedTables), \
             pytest.raises(SystemExit) as sysExitInfo:
 
             reprojectorUnderTest.reproject()

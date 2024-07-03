@@ -47,6 +47,7 @@ class FGDBReprojectionTransformer(Transformer):
     def __init__(self, parametersSupplied):
         self.context = {}
         self.messenger = Messenger()
+        self.arcpyProxy = arcpy_proxy.ArcpyProxy()
         self.parameters = parametersSupplied
 
     def transform(self, surveyGDB):
@@ -65,17 +66,17 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.info(f'Checking existing data via [{self.parameters[SDE_CONNECTION]}]')
         self.messenger.indent()
 
-        existingTables = arcpy_proxy.getSurveyTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
-        if len(existingTables) > 0:
-            self.getLastSynchronizationTime(existingTables)
+        existingDestinationTables = self.arcpyProxy.getSurveyTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
+        if len(existingDestinationTables) > 0:
+            self.getLastSynchronizationTime(existingDestinationTables)
             if self.context[LAST_SYNC_TIME] != None:
                 self.messenger.info(f'Last synchronisation time established [{time.createTimestampText(self.context[LAST_SYNC_TIME])}]')
             else:
-                self.messenger.warn(f'No last synchronisation time establised, despite [{len(existingTables)}] tables found.')
+                self.messenger.warn(f'No last synchronisation time establised, despite [{len(existingDestinationTables)}] tables found.')
         else:
             self.messenger.info(f'No existing tables with prefix [{self.parameters[PREFIX]}] found in [{self.parameters[SDE_CONNECTION]}]')
             
-        self.context[EXISTING_TABLES] = existingTables
+        self.context[EXISTING_TABLES] = existingDestinationTables
 
         self.messenger.outdent()
         self.messenger.info(f'Done checking existing data via [{self.parameters[SDE_CONNECTION]}]')
@@ -138,14 +139,15 @@ class FGDBReprojectionTransformer(Transformer):
         arcpy.env.workspace = surveyGDB
         
         nowText = time.createTimestampText(self.context[PROCESS_TIME])
-        tableList = arcpy_proxy.getSurveyTables(surveyGDB)
+        tableList = self.arcpyProxy.getSurveyTables(surveyGDB)
         dateField = arcpy.AddFieldDelimiters(surveyGDB, "CreationDate")
         excludeStatement = "CreationDate > date '{1}'".format(dateField, nowText)
         if LAST_SYNC_TIME in self.context.keys() and self.context[LAST_SYNC_TIME] != None:
-            lastSyncText = time.createTimestampText(self.context[LAST_SYNC_TIME])
+            lastSyncText = time.cresateTimestampText(self.context[LAST_SYNC_TIME])
             excludeStatement = f"{excludeStatement} OR CreationDate <= date '{lastSyncText}'"
 
-        self.messenger.info(f'Using filter view exclude statement [{excludeStatement}]')
+        self.messenger.info(f'Using view filter exclude statement [{excludeStatement}]')
+        self.messenger.indent()
 
         i = 0
         for table in tableList:
@@ -154,11 +156,14 @@ class FGDBReprojectionTransformer(Transformer):
             dsc = arcpy.Describe(table)
             if dsc.datatype == u'FeatureClass' or dsc.datatype == u'FeatureLayer':
                 arcpy.management.MakeFeatureLayer(table, thisName, excludeStatement)
+                self.messenger.debug(f'Deleting features from [{table}] as per exclude statement')
                 arcpy.management.DeleteFeatures(thisName)
             else:
                 arcpy.management.MakeTableView(table, thisName, excludeStatement)
+                self.messenger.debug(f'Deleting rows from table [{table}] as per exclude statement')
                 arcpy.management.DeleteRows(thisName)
             arcpy.management.Delete(thisName)
+        self.messenger.outdent()
         
         self.messenger.outdent()
         self.messenger.info(f'Done filtering records to new set since last synchronised...')
@@ -170,7 +175,7 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.indent()
 
         arcpy.env.workspace = surveyGDB
-        tableList = arcpy_proxy.getSurveyTables(surveyGDB)
+        tableList = self.arcpyProxy.getSurveyTables(surveyGDB)
         self.messenger.debug(f'Survey table list: {tableList}')
 
         self.addSynchronisationFields(surveyGDB, tableList)

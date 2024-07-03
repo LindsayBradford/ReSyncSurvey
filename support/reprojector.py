@@ -22,6 +22,7 @@ class SurveyReprojector:
     def __init__(self, parametersSupplied):
         self.parameters = parametersSupplied
         self.messenger = Messenger()
+        self.arcpyProxy = arcpy_proxy.ArcpyProxy()
         self.abortingException = None
 
         self.initialiseContext()
@@ -74,8 +75,8 @@ class SurveyReprojector:
             return
 
         message = f'Aborting script due to unrecoverable error [{self.abortingException}]'
-        if arcpy_proxy.runningWithinToolbox():
-            arcpy_proxy.raiseExecuteError(message, self.abortingException)
+        if self.arcpyProxy.runningWithinToolbox():
+            self.arcpyProxy.raiseExecuteError(message, self.abortingException)
         else:
             self.messenger.error(message)
             sys.exit(self.abortingException)
@@ -90,7 +91,7 @@ class SurveyReprojector:
         self.context[SECTION] = 'Loading'
         self.loader.loadFrom(surveyGDB)
 
-        arcpy_proxy.Delete(surveyGDB)    
+        self.arcpyProxy.Delete(surveyGDB)    
 
     def handleException(self, ex):
         exceptionType = type(ex).__name__
@@ -100,8 +101,8 @@ class SurveyReprojector:
         self.messenger.error(f'Exception: [{ex}]')
         self.messenger.error(f'Arguments: [{ex.args}]')
 
-        if arcpy_proxy.isExecuteError(ex): 
-            warnings = arcpy_proxy.GetMessages(1)
+        if self.arcpyProxy.isExecuteError(ex): 
+            warnings = self.arcpyProxy.GetMessages(1)
             splitWarnings = warnings.split('\n')
             if len(splitWarnings) > 0:
                 self.messenger.error('arcpy warning messages:')
@@ -110,7 +111,7 @@ class SurveyReprojector:
                     self.messenger.error(warning)
                 self.messenger.outdent()
             
-            errors = arcpy_proxy.GetMessages(2)  
+            errors = self.arcpyProxy.GetMessages(2)  
             splitErrors = errors.split('\n')
             if len(splitErrors) > 0:
                 self.messenger.error('arcpy error messages:')
@@ -141,7 +142,7 @@ class SurveyReprojector:
         self.messenger.info(f'Done cleaning up')
 
     def cleanupAppends(self, tables):
-        arcpy_proxy.cleanupAppends(self.parameters[SDE_CONNECTION], self.context[PROCESS_TIME], tables)
+        self.arcpyProxy.cleanupAppends(self.parameters[SDE_CONNECTION], self.context[PROCESS_TIME], tables)
 
     def cleanupCreatedTables(self):
-        arcpy_proxy.cleanupCreatedTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
+        self.arcpyProxy.cleanupCreatedTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
