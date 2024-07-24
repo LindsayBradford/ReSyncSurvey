@@ -64,9 +64,9 @@ def produceParameters():
         params[PREFIX] = arcpy.GetParameterAsText(1)
         params[SERVICE_URL] = arcpy.GetParameterAsText(2)
         params[TIMEZONE] = arcpy.GetParameterAsText(3)
-        params[PORTAL] = arcpy.GetParameterAsText(4)
         params[DESTINATION_CRS] = arcpy.GetParameterAsText(5) 
         params[DESTINATION_GEOGRAPHIC_TRANSFORMATIONS] = arcpy.GetParameterAsText(6)  
+        params[PORTAL] = arcpy.GetParameterAsText(4)
         params[PORTAL_USER_NAME] = arcpy.GetParameterAsText(7)
         params[PORTAL_PASSWORD] = arcpy.GetParameterAsText(8)
     else:
