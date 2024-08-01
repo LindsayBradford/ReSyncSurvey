@@ -29,6 +29,7 @@
     <Compile Include="arcpy\da\__init__.py" />
     <Compile Include="arcpy\env\__init__.py" />
     <Compile Include="arcpy\management\__init__.py" />
+    <Compile Include="deploy.py" />
     <Compile Include="support\config.py" />
     <Compile Include="ReSyncSurvey.py" />
     <Compile Include="support\loader.py" />
