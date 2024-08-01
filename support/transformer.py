@@ -67,22 +67,29 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.indent()
 
         existingDestinationTables = self.arcpyProxy.getSurveyTables(self.parameters[SDE_CONNECTION], self.parameters[PREFIX])
+        self.messenger.debug(f'Destination Survey Tables found = {existingDestinationTables}')
+
+        usernamePrefix = ''
+        destinationDB = self.parameters[SDE_CONNECTION]
+        if not destinationDB.endswith('.gdb'):
+            username = arcpy.Describe(destinationDB).connectionProperties.user
+            usernamePrefix = f'{username}.'
 
         if len(existingDestinationTables) > 0:
             existingExtractedTables = self.arcpyProxy.getSurveyTables(surveyGDB)
         
             tablesMatched = 0
             for extractedTable in existingExtractedTables:
-                expectedDestinationTable = f'{self.parameters[PREFIX]}_{extractedTable}'
+                expectedDestinationTable = f'{usernamePrefix}{self.parameters[PREFIX]}_{extractedTable}'
                 if expectedDestinationTable not in existingDestinationTables:
-                    self.messenger.warn(f'Extracted table [{extractedTable}] has no equivalent [{expectedDestinationTable}] in destination workspeace [{self.parameters[SDE_CONNECTION]}]')
+                    self.messenger.warn(f'Extracted table [{extractedTable}] has no equivalent [{expectedDestinationTable}] in destination workspace [{self.parameters[SDE_CONNECTION]}]')
                 else:
                     tablesMatched += 1
-                    self.messenger.debug(f'Extracted table [{extractedTable}] has equivalent [{expectedDestinationTable}] in destination workspeace [{self.parameters[SDE_CONNECTION]}]')
+                    self.messenger.debug(f'Extracted table [{extractedTable}] has equivalent [{expectedDestinationTable}] in destination workspce [{self.parameters[SDE_CONNECTION]}]')
                     
 
-            if tablesMatched != len(existingDestinationTables):
-                errorMsg = 'Mismatch of expected destination tables to extracted tables detected.' 
+            if tablesMatched != len(existingExtractedTables):
+                errorMsg = f'Mismatch of expected destination tables [{tablesMatched}] to extracted tables [{len(existingExtractedTables)}] detected.' 
                 self.messenger.error(errorMsg)
                 self.arcpyProxy.raiseExecuteError(errorMsg)
 
@@ -155,13 +162,12 @@ class FGDBReprojectionTransformer(Transformer):
         self.messenger.indent()
         
         arcpy.env.workspace = surveyGDB
-        
         nowText = time.createTimestampText(self.context[PROCESS_TIME])
         tableList = self.arcpyProxy.getSurveyTables(surveyGDB)
         dateField = arcpy.AddFieldDelimiters(surveyGDB, "CreationDate")
         excludeStatement = "CreationDate > date '{1}'".format(dateField, nowText)
         if LAST_SYNC_TIME in self.context.keys() and self.context[LAST_SYNC_TIME] != None:
-            lastSyncText = time.cresateTimestampText(self.context[LAST_SYNC_TIME])
+            lastSyncText = time.createTimestampText(self.context[LAST_SYNC_TIME])
             excludeStatement = f"{excludeStatement} OR CreationDate <= date '{lastSyncText}'"
 
         self.messenger.info(f'Using view filter exclude statement [{excludeStatement}]')
