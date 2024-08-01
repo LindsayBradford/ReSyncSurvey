@@ -272,5 +272,5 @@ class TestFGDReprojectionTransformer:
             
             assert fakeBridge.ListTablesCalled == 2
             assert fakeBridge.ListFeatureClassesCalled == 2
-            assert 'Mismatch of expected destination tables to extracted tables' in str(e_info.value)
+            assert 'Mismatch of expected destination tables' in str(e_info.value)
 

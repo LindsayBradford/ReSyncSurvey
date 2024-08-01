@@ -332,7 +332,9 @@ class ReprojectingSDEAppender(Loader):
             destFieldNames = [f.name for f in arcpy.ListFields(destinationFC)]
             fieldMap = self.createFieldMap(table, originFieldNames, destFieldNames)
 
+            self.messenger.debug(f'Appending data from table [{table}] to destination table [{destinationFC}]...')
             arcpy.management.Append(table, destinationFC, 'NO_TEST', fieldMap)
+            self.messenger.debug(f'Done Appending data from table [{table}] to destination table [{destinationFC}]')
 
             if destinationName in attachmentList:
                 self.appendAttachments(table, destinationFC)
