@@ -9,10 +9,25 @@
 
 from support.messenger import *
 
+from importlib import reload
 import pytest
 
 @pytest.mark.usefixtures("useTestDataDirectory", "resetArcpy", "resetMessengerSingleton")    
 class TestMessenger:
+    def test_InitReload_IsSingleton(self):
+        # when
+
+        import support.messenger as messenger
+
+        reload(messenger)
+
+        messengerOne = messenger.Messenger()
+        messengerTwo = messenger.Messenger()
+        
+        # then
+        assert messengerOne == messengerTwo
+
+
     def test_Init_IsSingleton(self):
         # when
 

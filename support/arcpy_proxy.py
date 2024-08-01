@@ -11,6 +11,9 @@ import support.time as time
 from support.messenger import Messenger
 import arcpy
 
+def __reload__(state):
+    ArcpyProxy().reset()
+
 class ArcpyProxy():
     _instance = None
 
