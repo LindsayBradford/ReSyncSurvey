@@ -1,6 +1,6 @@
 # ReSyncSurvey - synchronize a Feature Service with reprojection
 
-This script will extract the data from a Feature Service and import it into a File Geodatabase or an Enterprise Geodatabase, reprojecting coordinates as needed. This includes preserving attachments and other relationships. On subsequent runs, only new records are imported (based on time of syncronization).
+This script will extract the data from a Feature Service and import it into a File Geodatabase or an Enterprise Geodatabase, reprojecting coordinates as needed. This includes preserving attachments and other relationships. On subsequent runs, only new records are imported (based on time of syncronization). ReSyncurvey is a modernization and expansion of [SyncSurvey by James Tedrick](https://github.com/tedrick/SyncSurvey).
 
 ### Requirements
 - The Feature Service to be synchronized must have [Sync Cababilities enabled](http://doc.arcgis.com/en/arcgis-online/share-maps/manage-hosted-layers.htm#ESRI_SECTION2_C1D5C1A8F6084949B8C5BB444F0F44EC)
