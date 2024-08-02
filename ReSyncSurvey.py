@@ -41,8 +41,8 @@ def main():
 
 def reloadModulesForArcGISPro():
     # https://gis.stackexchange.com/questions/91112/refreshing-imported-modules-in-arcgis-python-toolbox
-    reload(arcpy_proxy)
     reload(messenger)
+    reload(arcpy_proxy)
     reload(config)
     reload(reprojector)
     reload(extractor)
